@@ -9,11 +9,11 @@ export enum FloorType {
   L5 = "L5",
 }
 
-export interface LocationModel {
+export type LocationModel = {
   _id: string;
   code: string;
   name: string;
   floor?: FloorType | null;
   description?: string;
   isActive: boolean;
-}
+};

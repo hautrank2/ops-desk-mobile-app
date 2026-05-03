@@ -1,9 +1,9 @@
+import { Button, ButtonText } from "@/components/ui/button";
 import { useAuthCtx } from "@/store/auth";
 import { router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Button } from "react-native-paper";
 
 SplashScreen.setOptions({
   duration: 1000,
@@ -29,11 +29,10 @@ const Screen = () => {
       </Text>
 
       <View style={styles.actions}>
-        <Button mode="contained" onPress={() => router.push("/login")}>
-          Login
-        </Button>
-        <Button mode="outlined" onPress={() => router.push("/sign-up")}>
-          Sign Up
+        <Button variant="solid" onPress={() => router.push("/login")}>
+          <ButtonText>
+            Login
+          </ButtonText>
         </Button>
       </View>
     </View>

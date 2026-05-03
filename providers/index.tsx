@@ -1,15 +1,21 @@
 import { AuthContextProvider } from "@/store/auth";
-import { PaperProvider } from "react-native-paper";
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { AppProvider } from "./AppProvider";
 
 export * from "./AppProvider";
 
+const queryClient = new QueryClient()
+
 export function AllProviders({ children }: { children: React.ReactNode }) {
+
   return (
-    <PaperProvider>
+    <QueryClientProvider client={queryClient}>
       <AppProvider>
         <AuthContextProvider>{children}</AuthContextProvider>
       </AppProvider>
-    </PaperProvider>
+    </QueryClientProvider>
   );
 }

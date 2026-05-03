@@ -4,7 +4,7 @@ import axios from "axios";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const getBaseUrl = () => {
-  return `${BASE_URL}/api`;
+  return `${BASE_URL}`;
 };
 
 export const httpClient = axios.create({

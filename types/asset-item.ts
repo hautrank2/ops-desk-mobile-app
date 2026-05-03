@@ -9,7 +9,7 @@ export enum AssetItemStatus {
   Retired = "Retired",
 }
 
-export interface AssetItemModel {
+export type AssetItemModel = {
   _id: string;
   asset: AssetModel | string;
   serialNumber?: string;
@@ -19,10 +19,10 @@ export interface AssetItemModel {
   notes?: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface CreateAssetItemDto {
+export type CreateAssetItemDto = {
   quantity: number;
   locationId?: string;
   ownerDeptId?: string;
-}
+};

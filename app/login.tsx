@@ -1,23 +1,28 @@
 import { LoginForm } from "@/components/auth/LoginForm";
+import { Heading } from "@/components/ui/heading";
 import { useAuthCtx } from "@/store/auth";
+import { useRouter } from "expo-router";
 import React from "react";
 import { View } from "react-native";
-import { Text } from "react-native-paper";
 
 const LoginPage = () => {
   const { onAuthticate } = useAuthCtx();
+  const router = useRouter();
 
   return (
-    <View className="p-2">
-      <Text variant="titleLarge">Login</Text>
+    <View className="flex-1 p-4">
+      <Heading size="xl">Login</Heading>
 
-      <LoginForm
-        afterSuccess={(result) => {
-          if (result._id) {
-            onAuthticate(result);
-          }
-        }}
-      />
+      <View className="mt-2">
+        <LoginForm
+          afterSuccess={async (result) => {
+            if (result._id) {
+              await onAuthticate(result);
+              router.navigate("/private/asset");
+            }
+          }}
+        />
+      </View>
     </View>
   );
 };

@@ -23,7 +23,7 @@ export enum TicketStatus {
   Cancelled = "Cancelled",
 }
 
-export interface TicketModel {
+export type TicketModel = {
   _id: string;
   code: string;
   title: string;
@@ -44,4 +44,4 @@ export interface TicketModel {
   updatedAt: string;
   createdBy?: UserModel;
   updatedBy?: UserModel;
-}
+};

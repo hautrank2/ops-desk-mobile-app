@@ -1,4 +1,4 @@
-export interface DepartmentModel {
+export type DepartmentModel = {
   _id: string;
   code: string;
   name: string;
@@ -6,13 +6,13 @@ export interface DepartmentModel {
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
-}
+};
 
-export interface CreateDepartmentDto {
+export type CreateDepartmentDto = {
   code: string;
   name: string;
   description?: string;
   isActive?: boolean;
-}
+};
 
 export type UpdateDepartmentDto = Partial<CreateDepartmentDto>;

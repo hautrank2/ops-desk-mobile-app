@@ -12,7 +12,7 @@ export enum UserStatusEnum {
   Blocked = 'blocked',
 }
 
-export interface UserModel {
+export type UserModel = {
   _id: string;
   username: string;
   email: string;
@@ -22,9 +22,9 @@ export interface UserModel {
   deptId?: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface CreateUserDto {
+export type CreateUserDto = {
   username: string;
   email: string;
   password: string;
@@ -32,13 +32,13 @@ export interface CreateUserDto {
   role: UserRole;
   deptId?: string;
   status?: UserStatus;
-}
+};
 
-export interface UpdateUserDto {
+export type UpdateUserDto = {
   email?: string;
   password?: string;
   name?: string;
   role?: UserRole;
   deptId?: string;
   status?: UserStatus;
-}
+};

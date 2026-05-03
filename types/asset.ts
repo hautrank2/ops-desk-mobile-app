@@ -8,7 +8,7 @@ export enum AssetType {
   Facility = "Facility",
 }
 
-export interface AssetModel {
+export type AssetModel = {
   _id: string;
   code: string;
   name: string;
@@ -23,4 +23,4 @@ export interface AssetModel {
   updatedAt: string;
   createdBy?: UserModel;
   updatedBy?: UserModel;
-}
+};
