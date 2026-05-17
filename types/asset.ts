@@ -1,3 +1,4 @@
+import { ImageAssetModel } from "./image";
 import { UserModel } from "./user";
 
 export enum AssetType {
@@ -32,9 +33,8 @@ export type CreateAssetPayload = {
   vendor?: string;
   model?: string;
   purchaseUrl?: string;
-  imageUrls?: string[];
-  active?: boolean;
   description?: string;
+  images?: ImageAssetModel[];
 };
 
 export type UpdateAssetPayload = Partial<CreateAssetPayload>;

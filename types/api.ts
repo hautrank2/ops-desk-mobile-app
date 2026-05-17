@@ -5,3 +5,11 @@ export type TableResponse<T> = {
   totalPage: number;
   items: T[];
 };
+
+export type ApiError = {
+  statusCode: number;
+  timestamp: string;
+  path: string;
+  error: string;
+  message: string;
+};

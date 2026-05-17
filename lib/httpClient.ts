@@ -9,9 +9,6 @@ const getBaseUrl = () => {
 
 export const httpClient = axios.create({
   baseURL: getBaseUrl(),
-  headers: {
-    "Content-Type": "application/json",
-  },
   paramsSerializer: (params) => {
     const parts: string[] = [];
     for (const [key, value] of Object.entries(params)) {
@@ -28,15 +25,26 @@ export const httpClient = axios.create({
     }
     return parts.join("&");
   },
-  timeout: 1000,
 });
 
 httpClient.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem(LOCAL_KEYS.TOKEN);
-  if (typeof window !== "undefined") {
-    if (token) {
+  if (token) {
+    try {
+      const parsedToken = typeof token === "string" ? JSON.parse(token) : token;
+      const jwtToken =
+        parsedToken.token || (typeof token === "string" ? token : "");
+      if (jwtToken) {
+        config.headers.Authorization = `Bearer ${jwtToken}`;
+      }
+    } catch {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
+
+  if (!config.headers["Content-Type"]) {
+    config.headers["Content-Type"] = "application/json";
+  }
+
   return config;
 });

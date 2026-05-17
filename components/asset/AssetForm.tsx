@@ -38,7 +38,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { ChevronDownIcon, TrashIcon } from "lucide-react-native";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
 import * as z from "zod";
@@ -52,7 +52,7 @@ const assetSchema = z.object({
   type: z.enum(Object.values(AssetType)),
   vendor: z.string().optional(),
   model: z.string().optional(),
-  purchaseUrl: z.string().optional(),
+  purchaseUrl: z.httpUrl({ error: "Please enter a valid URL" }).optional(),
   description: z.string().optional(),
   images: z.array(imageAssetSchema).optional(),
 });
@@ -63,33 +63,20 @@ export type AssetFormProps = {
   assetId?: string;
 };
 
+const getDefaultValues = (assetData?: any): AssetValues => ({
+  code: assetData?.code || "",
+  name: assetData?.name || "",
+  type: assetData?.type || AssetType.Device,
+  vendor: assetData?.vendor || "",
+  model: assetData?.model || "",
+  purchaseUrl: assetData?.purchaseUrl || "",
+  description: assetData?.description || "",
+  images: assetData?.images || [],
+});
+
 export const AssetForm = ({ assetId }: AssetFormProps) => {
   const isEdit = !!assetId;
   const toast = useToast();
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-  } = useForm({
-    resolver: zodResolver(assetSchema),
-    defaultValues: {
-      code: "",
-      name: "",
-      type: AssetType.Device,
-      vendor: "",
-      model: "",
-      purchaseUrl: "",
-      description: "",
-    },
-  });
-
-  const imageField = useFieldArray({
-    control,
-    name: "images",
-  });
 
   const { data: assetData, isLoading: isLoadingData } = useQuery({
     queryKey: ["asset", assetId],
@@ -97,28 +84,26 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
     enabled: isEdit,
   });
 
-  useEffect(() => {
-    if (assetData) {
-      const asset = assetData;
-      reset({
-        code: asset.code,
-        name: asset.name,
-        type: asset.type,
-        vendor: asset.vendor || "",
-        model: asset.model || "",
-        purchaseUrl: asset.purchaseUrl || "",
-        description: asset.description || "",
-      });
-    }
-  }, [assetData, reset]);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(assetSchema),
+    defaultValues: getDefaultValues(isEdit ? assetData : undefined),
+    values: isEdit ? getDefaultValues(assetData) : undefined,
+    mode: "onBlur",
+  });
 
-  const mutation = useMutation({
+  const imageField = useFieldArray({
+    control,
+    name: "images",
+  });
+
+  const createMutation = useMutation({
     mutationFn: (payload: AssetValues) => {
-      const { images, ...data } = payload;
-      if (isEdit) {
-        return assetService.update(assetId, data);
-      }
-      return assetService.create(data);
+      return assetService.create(payload);
     },
     onSuccess: () => {
       const toastId = Math.random().toString();
@@ -131,9 +116,54 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
             <Toast nativeID={"toast-" + id} action="success" variant="solid">
               <VStack space="xs">
                 <ToastTitle>Success</ToastTitle>
+                <ToastDescription>Asset created successfully!</ToastDescription>
+              </VStack>
+            </Toast>
+          );
+        },
+      });
+      router.back();
+    },
+    onError: (error) => {
+      console.log("errors", JSON.stringify(error));
+      const toastId = Math.random().toString();
+      toast.show({
+        id: toastId,
+        placement: "bottom",
+        duration: 3000,
+        render: ({ id }) => {
+          return (
+            <Toast nativeID={"toast-" + id} action="error" variant="solid">
+              <VStack space="xs">
+                <ToastTitle>Error</ToastTitle>
                 <ToastDescription>
-                  Asset {isEdit ? "updated" : "created"} successfully!
+                  {error?.message || "Something went wrong."}
                 </ToastDescription>
+              </VStack>
+            </Toast>
+          );
+        },
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (payload: AssetValues) => {
+      const { images, ...data } = payload;
+      return assetService.update(assetId!, data);
+    },
+    onSuccess: () => {
+      const toastId = Math.random().toString();
+      toast.show({
+        id: toastId,
+        placement: "top",
+        duration: 3000,
+        render: ({ id }) => {
+          return (
+            <Toast nativeID={"toast-" + id} action="success" variant="solid">
+              <VStack space="xs">
+                <ToastTitle>Success</ToastTitle>
+                <ToastDescription>Asset updated successfully!</ToastDescription>
               </VStack>
             </Toast>
           );
@@ -163,14 +193,18 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
     },
   });
 
-  const onSubmit = (data: AssetValues) => {
-    console.log("data", data);
-    // mutation.mutate(data);
-  };
+  const loading = createMutation.isPending || updateMutation.isPending;
 
-  useEffect(() => {
-    console.log("errors", errors);
-  }, [errors]);
+  const onSubmit = useCallback(
+    (data: AssetValues) => {
+      if (isEdit) {
+        updateMutation.mutate(data);
+      } else {
+        createMutation.mutate(data);
+      }
+    },
+    [isEdit, createMutation, updateMutation],
+  );
 
   const onPickImage = async () => {
     // No permissions request is necessary for launching the image library.
@@ -208,6 +242,10 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
       );
     }
   };
+
+  useEffect(() => {
+    console.log("errors form", errors);
+  }, [errors]);
 
   if (isLoadingData) {
     return (
@@ -345,7 +383,7 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
           />
         </FormControl>
 
-        <FormControl>
+        <FormControl isInvalid={!!errors.purchaseUrl}>
           <FormControlLabel>
             <FormControlLabelText>Purchase URL</FormControlLabelText>
           </FormControlLabel>
@@ -363,6 +401,11 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
             )}
             name="purchaseUrl"
           />
+          <FormControlError>
+            <FormControlErrorText>
+              {errors.purchaseUrl?.message}
+            </FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         <FormControl>
@@ -428,10 +471,10 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
 
         <Button
           onPress={handleSubmit(onSubmit)}
-          isDisabled={mutation.isPending}
+          isDisabled={loading}
           className="mt-4"
         >
-          {mutation.isPending && <ButtonSpinner />}
+          {loading && <ButtonSpinner />}
           <ButtonText>{isEdit ? "Update Asset" : "Create Asset"}</ButtonText>
         </Button>
       </VStack>
