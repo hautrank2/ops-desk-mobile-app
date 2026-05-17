@@ -52,13 +52,12 @@ export const LoginForm = ({
   afterSuccess,
   onCancel,
 }: LoginFormProps) => {
-  const [snackbar, setSnackbar] = useState<string | null>(null);
   const toast = useToast();
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isValid },
   } = useForm<LoginValues>({
     mode: "onChange",
     defaultValues: {
@@ -66,6 +65,7 @@ export const LoginForm = ({
       password: defaultValues?.password ?? "",
     },
   });
+  const [loading, setLoading] = useState(false);
 
   const mutation = useMutation({
     mutationKey: ["login"],
@@ -75,6 +75,7 @@ export const LoginForm = ({
 
   const onSubmit = async (values: LoginValues) => {
     try {
+      setLoading(true);
       const loginRes = await mutation.mutateAsync(values);
       await afterSuccess?.(loginRes, {
         username: values.username.trim(),
@@ -98,6 +99,8 @@ export const LoginForm = ({
           );
         },
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -210,7 +213,7 @@ export const LoginForm = ({
       </View>
 
       {onCancel && (
-        <Button variant="outline" onPress={onCancel} disabled={isSubmitting}>
+        <Button variant="outline" onPress={onCancel} disabled={loading}>
           Cancel
         </Button>
       )}
@@ -218,7 +221,7 @@ export const LoginForm = ({
       <Button
         variant="solid"
         onPress={handleSubmit(onSubmit)}
-        disabled={!isValid || isSubmitting || mutation.isPending}
+        disabled={!isValid || loading || mutation.isPending}
         className="mt-2"
       >
         <ButtonText>Login</ButtonText>

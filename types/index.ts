@@ -1,7 +1,9 @@
-export * from './api';
-export * from './user';
-export * from './department';
-export * from './location';
-export * from './asset';
-export * from './asset-item';
-export * from './ticket';
+export * from "./api";
+export * from "./asset";
+export * from "./asset-item";
+export * from "./department";
+export * from "./image";
+export * from "./location";
+export * from "./ticket";
+export * from "./user";
+

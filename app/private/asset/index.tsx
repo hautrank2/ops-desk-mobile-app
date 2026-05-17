@@ -90,15 +90,30 @@ const AssetScreen = () => {
             <View style={{ minWidth: 820 }}>
               <Table className="w-full">
                 <TableHeader>
-                  <TableRow className="flex-row bg-white" style={{ paddingLeft: 200, paddingRight: 100 }}>
-                    <TableHead useRNView className="absolute left-0 z-10 w-[200px] bg-white border-r border-gray-100 justify-center">
-                      <Text className="font-bold text-[16px] text-gray-800">Code</Text>
+                  <TableRow
+                    className="flex-row bg-white"
+                    style={{ paddingLeft: 200, paddingRight: 100 }}
+                  >
+                    <TableHead
+                      useRNView
+                      className="absolute left-0 z-10 w-[200px] bg-white border-r border-gray-100 justify-center"
+                    >
+                      <Text className="font-bold text-[16px] text-gray-800">
+                        Code
+                      </Text>
                     </TableHead>
                     <TableHead className="flex-none w-[250px]">Name</TableHead>
                     <TableHead className="flex-none w-[150px]">Type</TableHead>
-                    <TableHead className="flex-none w-[120px]">Status</TableHead>
-                    <TableHead useRNView className="absolute right-0 z-10 w-[100px] bg-white border-l border-gray-100 justify-center items-center">
-                      <Text className="font-bold text-[16px] text-gray-800">Action</Text>
+                    <TableHead className="flex-none w-[120px]">
+                      Status
+                    </TableHead>
+                    <TableHead
+                      useRNView
+                      className="absolute right-0 z-10 w-[100px] bg-white border-l border-gray-100 justify-center items-center"
+                    >
+                      <Text className="font-bold text-[16px] text-gray-800">
+                        Action
+                      </Text>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -124,7 +139,10 @@ const AssetScreen = () => {
                           className="border-b border-gray-100 items-center flex-row bg-white"
                           style={{ paddingLeft: 200, paddingRight: 100 }}
                         >
-                          <TableData useRNView className="absolute left-0 z-10 w-[200px] bg-white flex-row items-center h-full border-r border-gray-100">
+                          <TableData
+                            useRNView
+                            className="absolute left-0 z-10 w-[200px] bg-white flex-row items-center h-full border-r border-gray-100"
+                          >
                             <View
                               className="w-8 h-8 rounded-full items-center justify-center mr-3"
                               style={{ backgroundColor: `${color}20` }}
@@ -144,8 +162,12 @@ const AssetScreen = () => {
                               </Text>
                             </TouchableOpacity>
                           </TableData>
-                          <TableData className="flex-none w-[250px]">{item.name}</TableData>
-                          <TableData className="flex-none w-[150px]">{item.type}</TableData>
+                          <TableData className="flex-none w-[250px]">
+                            {item.name}
+                          </TableData>
+                          <TableData className="flex-none w-[150px]">
+                            {item.type}
+                          </TableData>
                           <TableData useRNView className="flex-none w-[120px]">
                             <Text
                               style={{
@@ -156,7 +178,10 @@ const AssetScreen = () => {
                               {item.active ? "Active" : "Inactive"}
                             </Text>
                           </TableData>
-                          <TableData useRNView className="absolute right-0 z-10 w-[100px] bg-white items-center justify-center h-full border-l border-gray-100">
+                          <TableData
+                            useRNView
+                            className="absolute right-0 z-10 w-[100px] bg-white items-center justify-center h-full border-l border-gray-100"
+                          >
                             <Button
                               size="sm"
                               variant="outline"

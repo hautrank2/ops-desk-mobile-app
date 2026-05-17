@@ -28,6 +28,7 @@ export const httpClient = axios.create({
     }
     return parts.join("&");
   },
+  timeout: 1000,
 });
 
 httpClient.interceptors.request.use(async (config) => {

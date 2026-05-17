@@ -1,11 +1,14 @@
-import { Text } from "@/components/ui/text";
-import React from "react";
-import { View } from "react-native";
+import React from 'react';
+import { View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { AssetForm } from '@/components/asset/AssetForm';
 
 const AssetItemScreen = () => {
+  const { id } = useLocalSearchParams();
+
   return (
-    <View>
-      <Text>AssetItemScreen</Text>
+    <View className="flex-1 bg-white">
+      <AssetForm assetId={id as string} />
     </View>
   );
 };

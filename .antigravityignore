@@ -1,0 +1,97 @@
+# ============================================
+# .antigravityignore — React Native project
+# Giảm token bằng cách loại bỏ context thừa
+# ============================================
+
+# --- Dependencies ---
+node_modules/
+.yarn/
+.pnp.js
+.pnp.cjs
+
+# --- Build outputs ---
+android/app/build/
+android/build/
+android/.gradle/
+android/app/src/main/assets/index.android.bundle
+android/app/src/main/assets/index.android.bundle.map
+ios/build/
+ios/Pods/
+ios/DerivedData/
+*.ipa
+*.apk
+*.aab
+*.dSYM/
+
+# --- Metro bundler cache ---
+.metro-health-check*
+.cache/
+.metro/
+/tmp/
+
+# --- Expo (nếu dùng) ---
+.expo/
+.expo-shared/
+dist/
+web-build/
+
+# --- Lockfiles (agent không cần đọc) ---
+package-lock.json
+yarn.lock
+Gemfile.lock
+Podfile.lock
+
+# --- Media & assets ---
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.mp4
+*.mov
+*.mp3
+*.wav
+*.ttf
+*.otf
+*.woff
+*.woff2
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Test coverage ---
+coverage/
+__coverage__/
+.nyc_output/
+
+# --- IDE & OS ---
+.DS_Store
+.DS_Store?
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Environment files ---
+.env
+.env.local
+.env.staging
+.env.production
+
+# --- TypeScript build ---
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# --- Generated / codegen ---
+android/app/src/main/jniLibs/
+ios/Pods/Headers/
+src/generated/
+__generated__/
+
+# --- Flipper ---
+ios/.xcode.env.local
