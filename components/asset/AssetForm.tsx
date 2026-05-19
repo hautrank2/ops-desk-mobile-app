@@ -434,7 +434,7 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
             <Controller
               name="images"
               control={control}
-              render={({ field: { onChange, value } }) => (
+              render={({ field: { value } }) => (
                 <View>
                   <Button onPress={onPickImage} variant="outline">
                     <ButtonText>Picker image</ButtonText>

@@ -1,7 +1,5 @@
-import { LOCAL_KEYS } from "@/constants/local";
 import { httpClient } from "@/lib/httpClient";
 import { AssetModel, CreateAssetPayload, UpdateAssetPayload } from "@/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const assetService = {
   get: async () => {
@@ -13,17 +11,6 @@ export const assetService = {
     return response.data;
   },
   create: async (data: CreateAssetPayload) => {
-    const token = await AsyncStorage.getItem(LOCAL_KEYS.TOKEN);
-    let jwtToken = token;
-    if (token) {
-      try {
-        const parsedToken = JSON.parse(token);
-        jwtToken = parsedToken.token || token;
-      } catch {
-        jwtToken = token;
-      }
-    }
-
     const apiUrl = `${process.env.EXPO_PUBLIC_API_URL}/asset`;
     console.log("API URL:", apiUrl);
 
@@ -36,32 +23,32 @@ export const assetService = {
       purchaseUrl: data.purchaseUrl || undefined,
       description: data.description || undefined,
     };
+    const formData = new FormData();
+    formData.append("code", payload.code);
+    formData.append("name", payload.name);
+    formData.append("type", payload.type);
+    if (payload.vendor) formData.append("vendor", payload.vendor);
+    if (payload.model) formData.append("model", payload.model);
+    if (payload.purchaseUrl)
+      formData.append("purchaseUrl", payload.purchaseUrl);
+    if (payload.description)
+      formData.append("description", payload.description);
+
+    if (data.images) {
+      data.images.forEach((image, index) => {
+        formData.append("images", {
+          uri: image.uri,
+          name: `image${index}.jpg`,
+          type: "image/jpeg",
+        } as any);
+      });
+    }
 
     console.log("Payload:", JSON.stringify(payload));
 
     try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: jwtToken ? `Bearer ${jwtToken}` : "",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      console.log("Fetch response status:", response.status, response.statusText);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Upload error:", response.status, errorText);
-        throw new Error(
-          errorText || `Upload failed: ${response.statusText}`
-        );
-      }
-
-      const result = await response.json();
-      console.log("Upload success:", result);
-      return result;
+      const response = await httpClient.post<AssetModel>("/asset", payload);
+      return response.data;
     } catch (error: any) {
       console.error("Create asset error:", error.message || error);
       throw error;
