@@ -45,3 +45,54 @@ export type TicketModel = {
   createdBy?: UserModel;
   updatedBy?: UserModel;
 };
+
+export type TicketQueryModel = {
+  page?: number;
+  pageSize?: number;
+  code?: string;
+  title?: string;
+  type?: TicketType;
+  priority?: TicketPriority;
+  status?: TicketStatus;
+  /** Filter by asset item ids */
+  assetItemIds?: string[];
+  locationId?: string;
+  assigneeId?: string;
+  departmentId?: string;
+  /** ISO date string — due date range start */
+  startDueAt?: string;
+  /** ISO date string — due date range end */
+  endDueAt?: string;
+  createdBy?: string;
+  sortBy?: "createdAt" | "updatedAt" | "dueAt" | "priority" | "status";
+  order?: "asc" | "desc";
+  populations?: ("createdBy" | "updatedBy" | "assetItemId")[];
+};
+
+export type CreateTicketModel = {
+  code: string;
+  title: string;
+  description?: string;
+  type: TicketType;
+  /** At least 1 asset item id required */
+  assetItemIds: string[];
+  priority?: TicketPriority;
+  status?: TicketStatus;
+  cause?: string;
+  note?: string;
+  locationId?: string;
+  assigneeId?: string;
+  teamId?: string;
+  /** ISO date string */
+  dueAt?: string;
+  /** ISO date string */
+  closedAt?: string;
+  images?: Array<{ uri: string; fileName?: string | null; mimeType?: string | null }>;
+};
+
+export type UpdateTicketModel = Partial<Omit<CreateTicketModel, "images">>;
+
+export type AddTicketImageModel = {
+  id: string;
+  images: Array<{ uri: string; fileName?: string | null; mimeType?: string | null }>;
+};

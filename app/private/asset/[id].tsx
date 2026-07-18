@@ -1,41 +1,24 @@
-import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { AssetForm } from '@/components/asset/AssetForm';
-import { httpClient } from '@/lib/httpClient';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AssetModel } from '@/types';
-import { Text } from '@/components/ui/text';
+import { assetApi } from "@/api/asset";
+import { AssetForm } from "@/components/asset/AssetForm";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+import { useQuery } from "@tanstack/react-query";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Images } from "lucide-react-native";
+import React from "react";
+import { ActivityIndicator, View } from "react-native";
 
 const EditAssetScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const queryClient = useQueryClient();
 
-  const { data: asset, isLoading: isFetching } = useQuery({
-    queryKey: ['get', 'asset', id],
-    queryFn: async () => {
-      const response = await httpClient.get(`/asset/${id}`);
-      return response.data as AssetModel;
-    },
+  const { isLoading } = useQuery({
+    queryKey: ["asset", id],
+    queryFn: () => assetApi.getById(id!),
     enabled: !!id,
   });
 
-  const mutation = useMutation({
-    mutationFn: (data: Partial<AssetModel>) => {
-      return httpClient.patch(`/asset/${id}`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['get', 'asset'] });
-      queryClient.invalidateQueries({ queryKey: ['get', 'asset', id] });
-      router.back();
-    },
-    onError: (error) => {
-      console.error('Failed to update asset:', error);
-    }
-  });
-
-  if (isFetching) {
+  if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" />
@@ -43,7 +26,7 @@ const EditAssetScreen = () => {
     );
   }
 
-  if (!asset) {
+  if (!id) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <Text>Asset not found</Text>
@@ -53,11 +36,24 @@ const EditAssetScreen = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <AssetForm
-        initialData={asset}
-        onSubmit={(data) => mutation.mutate(data)}
-        isLoading={mutation.isPending}
-      />
+      {/* Nút navigate sang trang quản lý ảnh */}
+      <View className="px-4 pt-4">
+        <Button
+          variant="outline"
+          onPress={() =>
+            router.push({
+              pathname: "/private/asset/images",
+              params: { id },
+            })
+          }
+          className="mb-2"
+        >
+          <ButtonIcon as={Images} className="mr-2" />
+          <ButtonText>Manage Images</ButtonText>
+        </Button>
+      </View>
+
+      <AssetForm assetId={id} />
     </View>
   );
 };

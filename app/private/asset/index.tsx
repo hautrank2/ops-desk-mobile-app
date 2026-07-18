@@ -1,3 +1,4 @@
+import { assetApi } from "@/api/asset";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import {
   Table,
@@ -9,12 +10,11 @@ import {
 } from "@/components/ui/table";
 import { Text } from "@/components/ui/text";
 import { getAssetIcon } from "@/lib/asset-icon-config";
-import { httpClient } from "@/lib/httpClient";
-import { AssetModel, TableResponse } from "@/types";
+import { AssetModel } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react-native";
-import React, { useState } from "react";
+import { ChevronLeft, ChevronRight, Images, Plus, Trash2 } from "lucide-react-native";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -27,24 +27,15 @@ const AssetScreen = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["get", "asset", page, pageSize],
-    queryFn: async () => {
-      const response = await httpClient.get<TableResponse<AssetModel>>(
-        "/asset",
-        {
-          params: { page, pageSize },
-        },
-      );
-      // Handle both paginated TableResponse and flat array response
-      return response.data;
-    },
+    queryFn: () => assetApi.getList({ page, pageSize }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => httpClient.delete(`/asset/${id}`),
+    mutationFn: (id: string) => assetApi.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["get", "asset"] });
     },
@@ -65,13 +56,13 @@ const AssetScreen = () => {
     ]);
   };
 
-  const assets: AssetModel[] = data?.items || (Array.isArray(data) ? data : []);
-  const totalPage = data?.totalPage || 1;
+  const assets: AssetModel[] = useMemo(() => data?.items ?? [], [data]);
+  const totalPage = data?.totalPage ?? 1;
 
   return (
     <View className="flex-1 bg-gray-50 p-4">
       <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-xl font-bold">Total: {data?.total || 0}</Text>
+        <Text className="text-xl font-bold">Total: {data?.total ?? 0}</Text>
         <Button size="sm" onPress={() => router.push("/private/asset/add")}>
           <ButtonIcon as={Plus} className="mr-2" />
           <ButtonText>Create Asset</ButtonText>
@@ -92,7 +83,7 @@ const AssetScreen = () => {
                 <TableHeader>
                   <TableRow
                     className="flex-row bg-white"
-                    style={{ paddingLeft: 200, paddingRight: 100 }}
+                    style={{ paddingLeft: 200, paddingRight: 150 }}
                   >
                     <TableHead
                       useRNView
@@ -109,7 +100,7 @@ const AssetScreen = () => {
                     </TableHead>
                     <TableHead
                       useRNView
-                      className="absolute right-0 z-10 w-[100px] bg-white border-l border-gray-100 justify-center items-center"
+                      className="absolute right-0 z-10 w-[150px] bg-white border-l border-gray-100 justify-center items-center"
                     >
                       <Text className="font-bold text-[16px] text-gray-800">
                         Action
@@ -137,7 +128,7 @@ const AssetScreen = () => {
                         <TableRow
                           key={item._id}
                           className="border-b border-gray-100 items-center flex-row bg-white"
-                          style={{ paddingLeft: 200, paddingRight: 100 }}
+                          style={{ paddingLeft: 200, paddingRight: 150 }}
                         >
                           <TableData
                             useRNView
@@ -180,8 +171,21 @@ const AssetScreen = () => {
                           </TableData>
                           <TableData
                             useRNView
-                            className="absolute right-0 z-10 w-[100px] bg-white items-center justify-center h-full border-l border-gray-100"
+                            className="absolute right-0 z-10 w-[150px] bg-white flex-row items-center justify-center gap-2 h-full border-l border-gray-100"
                           >
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onPress={() =>
+                                router.push({
+                                  pathname: "/private/asset/images",
+                                  params: { id: item._id },
+                                })
+                              }
+                              className="px-2"
+                            >
+                              <ButtonIcon as={Images} />
+                            </Button>
                             <Button
                               size="sm"
                               variant="outline"

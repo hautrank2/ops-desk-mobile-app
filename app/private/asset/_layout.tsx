@@ -6,6 +6,8 @@ export default function AssetStackLayout() {
       <Stack.Screen name="index" options={{ title: "Asset" }} />
       <Stack.Screen name="add" options={{ title: "Create Asset" }} />
       <Stack.Screen name="[id]" options={{ title: "Edit Asset" }} />
+      <Stack.Screen name="images" options={{ title: "Manage Images" }} />
     </Stack>
   );
 }
+

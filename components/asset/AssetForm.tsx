@@ -1,3 +1,4 @@
+import { assetApi } from "@/api/asset";
 import {
   Button,
   ButtonIcon,
@@ -31,14 +32,13 @@ import {
   useToast,
 } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
-import { assetService } from "@/services/asset";
 import { AssetType, imageAssetSchema } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { ChevronDownIcon, TrashIcon } from "lucide-react-native";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Alert, ScrollView, View } from "react-native";
 import * as z from "zod";
@@ -46,41 +46,49 @@ import { Image } from "../ui/image";
 
 const assetTypes = Object.values(AssetType);
 
+// purchaseUrl: optional — nếu empty string thì bỏ qua, có giá trị thì validate URL
 const assetSchema = z.object({
   code: z.string().min(3, "Code must be at least 3 characters"),
   name: z.string().min(3, "Name must be at least 3 characters"),
-  type: z.enum(Object.values(AssetType)),
+  type: z.enum(Object.values(AssetType) as [string, ...string[]]),
   vendor: z.string().optional(),
   model: z.string().optional(),
-  purchaseUrl: z.httpUrl({ error: "Please enter a valid URL" }).optional(),
+  purchaseUrl: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || val === "" || /^https?:\/\/.+/.test(val),
+      "Please enter a valid URL (https://...)",
+    ),
   description: z.string().optional(),
   images: z.array(imageAssetSchema).optional(),
 });
 
-export type AssetValues = z.infer<typeof assetSchema>;
+export type AssetFormValues = z.infer<typeof assetSchema>;
 
 export type AssetFormProps = {
   assetId?: string;
 };
 
-const getDefaultValues = (assetData?: any): AssetValues => ({
-  code: assetData?.code || "",
-  name: assetData?.name || "",
-  type: assetData?.type || AssetType.Device,
-  vendor: assetData?.vendor || "",
-  model: assetData?.model || "",
-  purchaseUrl: assetData?.purchaseUrl || "",
-  description: assetData?.description || "",
-  images: assetData?.images || [],
+const getDefaultValues = (assetData?: any): AssetFormValues => ({
+  code: assetData?.code ?? "",
+  name: assetData?.name ?? "",
+  type: assetData?.type ?? AssetType.Device,
+  vendor: assetData?.vendor ?? "",
+  model: assetData?.model ?? "",
+  purchaseUrl: assetData?.purchaseUrl ?? "",
+  description: assetData?.description ?? "",
+  images: [],
 });
 
 export const AssetForm = ({ assetId }: AssetFormProps) => {
   const isEdit = !!assetId;
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const { data: assetData, isLoading: isLoadingData } = useQuery({
     queryKey: ["asset", assetId],
-    queryFn: () => assetService.getById(assetId!),
+    queryFn: () => assetApi.getById(assetId!),
     enabled: isEdit,
   });
 
@@ -89,10 +97,10 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
+  } = useForm<AssetFormValues>({
     resolver: zodResolver(assetSchema),
-    defaultValues: getDefaultValues(isEdit ? assetData : undefined),
-    values: isEdit ? getDefaultValues(assetData) : undefined,
+    defaultValues: getDefaultValues(),
+    values: isEdit && assetData ? getDefaultValues(assetData) : undefined,
     mode: "onBlur",
   });
 
@@ -101,102 +109,84 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
     name: "images",
   });
 
-  const createMutation = useMutation({
-    mutationFn: (payload: AssetValues) => {
-      return assetService.create(payload);
-    },
-    onSuccess: () => {
+  const showToast = useCallback(
+    (action: "success" | "error", title: string, description: string) => {
       const toastId = Math.random().toString();
       toast.show({
         id: toastId,
-        placement: "top",
+        placement: action === "success" ? "top" : "bottom",
         duration: 3000,
-        render: ({ id }) => {
-          return (
-            <Toast nativeID={"toast-" + id} action="success" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Success</ToastTitle>
-                <ToastDescription>Asset created successfully!</ToastDescription>
-              </VStack>
-            </Toast>
-          );
-        },
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action={action} variant="solid">
+            <VStack space="xs">
+              <ToastTitle>{title}</ToastTitle>
+              <ToastDescription>{description}</ToastDescription>
+            </VStack>
+          </Toast>
+        ),
       });
+    },
+    [toast],
+  );
+
+  const createMutation = useMutation({
+    mutationFn: (payload: AssetFormValues) =>
+      assetApi.create({
+        code: payload.code,
+        name: payload.name,
+        type: payload.type as AssetType,
+        vendor: payload.vendor || undefined,
+        model: payload.model || undefined,
+        purchaseUrl: payload.purchaseUrl || undefined,
+        description: payload.description || undefined,
+        images: payload.images,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["get", "asset"] });
+      showToast("success", "Success", "Asset created successfully!");
+      reset(getDefaultValues());
       router.back();
     },
-    onError: (error) => {
-      console.log("errors", JSON.stringify(error));
-      const toastId = Math.random().toString();
-      toast.show({
-        id: toastId,
-        placement: "bottom",
-        duration: 3000,
-        render: ({ id }) => {
-          return (
-            <Toast nativeID={"toast-" + id} action="error" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Error</ToastTitle>
-                <ToastDescription>
-                  {error?.message || "Something went wrong."}
-                </ToastDescription>
-              </VStack>
-            </Toast>
-          );
-        },
-      });
+    onError: (error: any) => {
+      const msg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong.";
+      showToast("error", "Error", msg);
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: (payload: AssetValues) => {
-      const { images, ...data } = payload;
-      return assetService.update(assetId!, data);
-    },
+    mutationFn: (payload: AssetFormValues) =>
+      assetApi.update(assetId!, {
+        name: payload.name,
+        type: payload.type as AssetType,
+        vendor: payload.vendor || undefined,
+        model: payload.model || undefined,
+        purchaseUrl: payload.purchaseUrl || undefined,
+        description: payload.description || undefined,
+      }),
     onSuccess: () => {
-      const toastId = Math.random().toString();
-      toast.show({
-        id: toastId,
-        placement: "top",
-        duration: 3000,
-        render: ({ id }) => {
-          return (
-            <Toast nativeID={"toast-" + id} action="success" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Success</ToastTitle>
-                <ToastDescription>Asset updated successfully!</ToastDescription>
-              </VStack>
-            </Toast>
-          );
-        },
-      });
+      queryClient.invalidateQueries({ queryKey: ["get", "asset"] });
+      queryClient.invalidateQueries({ queryKey: ["asset", assetId] });
+      showToast("success", "Success", "Asset updated successfully!");
       router.back();
     },
     onError: (error: any) => {
-      const toastId = Math.random().toString();
-      toast.show({
-        id: toastId,
-        placement: "top",
-        duration: 3000,
-        render: ({ id }) => {
-          return (
-            <Toast nativeID={"toast-" + id} action="error" variant="solid">
-              <VStack space="xs">
-                <ToastTitle>Error</ToastTitle>
-                <ToastDescription>
-                  {error?.message || "Something went wrong."}
-                </ToastDescription>
-              </VStack>
-            </Toast>
-          );
-        },
-      });
+      const msg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong.";
+      console.log("error", JSON.stringify(error));
+
+      showToast("error", "Error", msg);
     },
   });
 
   const loading = createMutation.isPending || updateMutation.isPending;
 
   const onSubmit = useCallback(
-    (data: AssetValues) => {
+    (data: AssetFormValues) => {
       if (isEdit) {
         updateMutation.mutate(data);
       } else {
@@ -207,11 +197,12 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
   );
 
   const onPickImage = async () => {
-    // No permissions request is necessary for launching the image library.
-    // Manually request permissions for videos on iOS when `allowsEditing` is set to `false`
-    // and `videoExportPreset` is `'Passthrough'` (the default), ideally before launching the picker
-    // so the app users aren't surprised by a system dialog after picking a video.
-    // See "Invoke permissions for videos" sub section for more details.
+    const currentCount = imageField.fields.length;
+    if (currentCount >= 2) {
+      Alert.alert("Limit reached", "You can only upload up to 2 images.");
+      return;
+    }
+
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -223,29 +214,32 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
       return;
     }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.8,
     });
 
     if (!result.canceled) {
-      imageField.append(
-        result.assets.map((asset) => ({
+      const remaining = 2 - currentCount;
+      result.assets.slice(0, remaining).forEach((asset) => {
+        imageField.append({
           uri: asset.uri,
           width: asset.width,
           height: asset.height,
-          type: asset.type === "image" ? "image" : "video",
-          duration: asset.duration,
-        })),
-      );
+          type: "image",
+          fileName: asset.fileName ?? undefined,
+          fileSize: asset.fileSize ?? undefined,
+          mimeType: asset.mimeType ?? undefined,
+          duration: null,
+          exif: null,
+          base64: null,
+          assetId: null,
+        });
+      });
     }
   };
-
-  useEffect(() => {
-    console.log("errors form", errors);
-  }, [errors]);
 
   if (isLoadingData) {
     return (
@@ -261,14 +255,16 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
       contentContainerStyle={{ padding: 16 }}
     >
       <VStack space="md">
+        {/* Code */}
         <FormControl isRequired isInvalid={!!errors.code}>
           <FormControlLabel>
             <FormControlLabelText>Code</FormControlLabelText>
           </FormControlLabel>
           <Controller
             control={control}
+            name="code"
             render={({ field: { onChange, onBlur, value } }) => (
-              <Input>
+              <Input isDisabled={isEdit}>
                 <InputField
                   placeholder="e.g. AST-001"
                   onBlur={onBlur}
@@ -277,19 +273,20 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
                 />
               </Input>
             )}
-            name="code"
           />
           <FormControlError>
             <FormControlErrorText>{errors.code?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
 
+        {/* Name */}
         <FormControl isRequired isInvalid={!!errors.name}>
           <FormControlLabel>
             <FormControlLabelText>Name</FormControlLabelText>
           </FormControlLabel>
           <Controller
             control={control}
+            name="name"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField
@@ -300,19 +297,20 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
                 />
               </Input>
             )}
-            name="name"
           />
           <FormControlError>
             <FormControlErrorText>{errors.name?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
 
-        <FormControl>
+        {/* Type */}
+        <FormControl isRequired isInvalid={!!errors.type}>
           <FormControlLabel>
             <FormControlLabelText>Type</FormControlLabelText>
           </FormControlLabel>
           <Controller
             control={control}
+            name="type"
             render={({ field: { onChange, onBlur, value } }) => (
               <Select selectedValue={value} onValueChange={(v) => onChange(v)}>
                 <SelectTrigger
@@ -336,19 +334,20 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
                 </SelectPortal>
               </Select>
             )}
-            name="type"
           />
           <FormControlError>
             <FormControlErrorText>{errors.type?.message}</FormControlErrorText>
           </FormControlError>
         </FormControl>
 
+        {/* Vendor */}
         <FormControl>
           <FormControlLabel>
             <FormControlLabelText>Vendor</FormControlLabelText>
           </FormControlLabel>
           <Controller
             control={control}
+            name="vendor"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField
@@ -359,16 +358,17 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
                 />
               </Input>
             )}
-            name="vendor"
           />
         </FormControl>
 
+        {/* Model */}
         <FormControl>
           <FormControlLabel>
             <FormControlLabelText>Model</FormControlLabelText>
           </FormControlLabel>
           <Controller
             control={control}
+            name="model"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField
@@ -379,16 +379,17 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
                 />
               </Input>
             )}
-            name="model"
           />
         </FormControl>
 
+        {/* Purchase URL */}
         <FormControl isInvalid={!!errors.purchaseUrl}>
           <FormControlLabel>
             <FormControlLabelText>Purchase URL</FormControlLabelText>
           </FormControlLabel>
           <Controller
             control={control}
+            name="purchaseUrl"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField
@@ -396,10 +397,11 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  keyboardType="url"
+                  autoCapitalize="none"
                 />
               </Input>
             )}
-            name="purchaseUrl"
           />
           <FormControlError>
             <FormControlErrorText>
@@ -408,12 +410,14 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
           </FormControlError>
         </FormControl>
 
+        {/* Description */}
         <FormControl>
           <FormControlLabel>
             <FormControlLabelText>Description</FormControlLabelText>
           </FormControlLabel>
           <Controller
             control={control}
+            name="description"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField
@@ -421,42 +425,48 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  multiline
+                  numberOfLines={3}
                 />
               </Input>
             )}
-            name="description"
           />
         </FormControl>
 
+        {/* Images (max 2) */}
         <FormControl>
           <View className="mt-2">
-            <FormControlLabelText>Images</FormControlLabelText>
+            <FormControlLabelText>
+              Images ({imageField.fields.length}/2)
+            </FormControlLabelText>
             <Controller
               name="images"
               control={control}
               render={({ field: { value } }) => (
                 <View>
-                  <Button onPress={onPickImage} variant="outline">
-                    <ButtonText>Picker image</ButtonText>
+                  <Button
+                    onPress={onPickImage}
+                    variant="outline"
+                    isDisabled={imageField.fields.length >= 2}
+                    className="mt-2"
+                  >
+                    <ButtonText>Pick Image</ButtonText>
                   </Button>
                   <View className="mt-4 flex-row flex-wrap items-start gap-4">
                     {value?.map((img, index) => (
-                      <View key={img.uri} className="relative">
+                      <View key={`${img.uri}-${index}`} className="relative">
                         <View className="absolute top-0 right-0 z-10">
                           <Button
-                            onPress={() => {
-                              imageField.remove(index);
-                            }}
+                            onPress={() => imageField.remove(index)}
                             variant="solid"
+                            size="xs"
                           >
                             <ButtonIcon as={TrashIcon} />
                           </Button>
                         </View>
                         <Image
-                          source={{
-                            uri: img.uri,
-                          }}
-                          alt="Logo"
+                          source={{ uri: img.uri }}
+                          alt={`Image ${index + 1}`}
                           size="none"
                           className="w-full max-w-[100px] aspect-square rounded"
                         />

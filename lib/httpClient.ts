@@ -42,9 +42,5 @@ httpClient.interceptors.request.use(async (config) => {
     }
   }
 
-  if (!config.headers["Content-Type"]) {
-    config.headers["Content-Type"] = "application/json";
-  }
-
   return config;
 });
