@@ -41,6 +41,7 @@ export default function RootLayout() {
         name="ticket"
         options={{
           title: "Ticket",
+          headerShown: false,
           tabBarIcon: ({ color }) => <Icon as={TicketIcon} color={color} />,
         }}
       />
