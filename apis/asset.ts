@@ -4,6 +4,7 @@ import {
   AddAssetImageModel,
   AssetModel,
   AssetQueryModel,
+  CreateAssetItemModel,
   CreateAssetModel,
   TableResponse,
   UpdateAssetModel,
@@ -151,13 +152,7 @@ export const assetApis = {
    */
   createItems: async (
     id: string,
-    args: {
-      quantity: number;
-      locationId?: string;
-      ownerDeptId?: string;
-      serialNumber?: string;
-      note?: string;
-    },
+    args: CreateAssetItemModel,
   ): Promise<unknown> => {
     const res = await httpClient.post(`/asset/${id}/items`, args);
     return res.data;

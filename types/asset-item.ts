@@ -1,37 +1,25 @@
-import { DepartmentModel } from './department';
-import { LocationModel } from './location';
-import { AssetModel } from './asset';
+import { UserModel } from './user';
 
 export enum AssetItemStatus {
-  Available = "Available",
-  InUse = "InUse",
-  UnderMaintenance = "UnderMaintenance",
+  Active = "Active",
+  Faulty = "Faulty",
+  Maintenance = "Maintenance",
   Retired = "Retired",
 }
 
 export type AssetItemModel = {
   _id: string;
-  asset: AssetModel | string;
-  serialNumber?: string;
+  assetId: string;
+  code: string;
   status: AssetItemStatus;
-  location?: LocationModel | null;
-  ownerDept?: DepartmentModel | null;
-  notes?: string;
+  locationId?: string;
+  serialNumber?: string;
+  note?: string;
   createdAt: string;
   updatedAt: string;
+  createdBy?: UserModel;
+  updatedBy?: UserModel;
 };
-
-export type CreateAssetItemDto = {
-  quantity: number;
-  locationId?: string;
-  ownerDeptId?: string;
-};
-
-export type AssetItemStatusModel =
-  | "Active"
-  | "Faulty"
-  | "Maintenance"
-  | "Retired";
 
 export type AssetItemQueryModel = {
   page?: number;
@@ -45,15 +33,22 @@ export type AssetItemQueryModel = {
   /** Filter by assetId */
   assetId?: string;
   /** Filter by status */
-  status?: AssetItemStatusModel;
+  status?: AssetItemStatus;
   /** Populate related fields */
   include?: ("createdBy" | "updatedBy")[];
 };
 
-export type UpdateAssetItemModel = {
-  status?: AssetItemStatusModel;
+export type CreateAssetItemModel = {
+  quantity: number;
   locationId?: string;
   ownerDeptId?: string;
+  serialNumber?: string;
+  note?: string;
+};
+
+export type UpdateAssetItemModel = {
+  status?: AssetItemStatus;
+  locationId?: string;
   serialNumber?: string;
   note?: string;
 };
