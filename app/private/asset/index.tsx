@@ -178,7 +178,7 @@ const AssetScreen = () => {
                               variant="outline"
                               onPress={() =>
                                 router.push({
-                                  pathname: "/private/asset/images",
+                                  pathname: "/private/asset/[id]/images",
                                   params: { id: item._id },
                                 })
                               }

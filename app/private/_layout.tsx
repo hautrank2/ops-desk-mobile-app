@@ -1,16 +1,13 @@
 import { Icon } from "@/components/ui/icon";
-import { Tabs, useRouter } from "expo-router";
+import { Tabs } from "expo-router";
 import {
   BoxIcon,
   LayoutDashboardIcon,
   PackageIcon,
   TicketIcon,
-  ArrowLeft,
 } from "lucide-react-native";
-import { TouchableOpacity } from "react-native";
 
 export default function RootLayout() {
-  const router = useRouter();
   return (
     <Tabs>
       <Tabs.Screen
