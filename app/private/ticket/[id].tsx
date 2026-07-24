@@ -1,15 +1,20 @@
 import { ticketApis } from "@/apis/ticket";
-import { TicketForm } from "@/components/ticket/TicketForm";
 import { TicketCommentSection } from "@/components/ticket/TicketCommentSection";
+import { TicketForm } from "@/components/ticket/TicketForm";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Images } from "lucide-react-native";
 import React, { useState } from "react";
-import { ActivityIndicator, View, TouchableOpacity, ScrollView } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-const EditTicketScreen = () => {
+const DetailTicketScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"info" | "comments">("info");
@@ -50,7 +55,9 @@ const EditTicketScreen = () => {
           >
             <Text
               className={`text-xs font-bold ${
-                activeTab === "info" ? "text-typography-0" : "text-typography-600"
+                activeTab === "info"
+                  ? "text-typography-0"
+                  : "text-typography-600"
               }`}
             >
               Info
@@ -64,7 +71,9 @@ const EditTicketScreen = () => {
           >
             <Text
               className={`text-xs font-bold ${
-                activeTab === "comments" ? "text-typography-0" : "text-typography-600"
+                activeTab === "comments"
+                  ? "text-typography-0"
+                  : "text-typography-600"
               }`}
             >
               Comments
@@ -102,4 +111,4 @@ const EditTicketScreen = () => {
   );
 };
 
-export default EditTicketScreen;
+export default DetailTicketScreen;

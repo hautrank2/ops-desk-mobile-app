@@ -1,29 +1,33 @@
-import { useState, useCallback, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
-import { Alert } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { ticketApis } from "@/apis/ticket";
-import { httpClient } from "@/lib/httpClient";
-import { useToast, Toast, ToastTitle, ToastDescription } from "@/components/ui/toast";
-import { VStack } from "@/components/ui/vstack";
-import React from "react";
 import {
-  LocationModel,
-  UserModel,
+  Toast,
+  ToastDescription,
+  ToastTitle,
+  useToast,
+} from "@/components/ui/toast";
+import { VStack } from "@/components/ui/vstack";
+import { httpClient } from "@/lib/httpClient";
+import {
   AssetItemModel,
+  LocationModel,
   TableResponse,
-  TicketType,
   TicketPriority,
   TicketStatus,
+  TicketType,
+  UserModel,
 } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { Alert } from "react-native";
 import {
+  getDefaultValues,
   TicketFormProps,
   TicketFormValues,
   ticketSchema,
-  getDefaultValues,
 } from "./type";
 
 export const useTicketForm = ({ ticketId }: TicketFormProps) => {
@@ -42,7 +46,9 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
   const { data: locations = [] } = useQuery<LocationModel[]>({
     queryKey: ["get", "locations-all"],
     queryFn: async () => {
-      const { data } = await httpClient.get<LocationModel[] | TableResponse<LocationModel>>("/location");
+      const { data } = await httpClient.get<
+        LocationModel[] | TableResponse<LocationModel>
+      >("/location");
       return Array.isArray(data) ? data : data.items || [];
     },
   });
@@ -58,7 +64,9 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
   const { data: assetItems = [] } = useQuery<AssetItemModel[]>({
     queryKey: ["get", "asset-items-all"],
     queryFn: async () => {
-      const { data } = await httpClient.get<TableResponse<AssetItemModel> | AssetItemModel[]>("/asset-item");
+      const { data } = await httpClient.get<
+        TableResponse<AssetItemModel> | AssetItemModel[]
+      >("/asset-item");
       return Array.isArray(data) ? data : data.items || [];
     },
   });
@@ -96,14 +104,17 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
         id: toastId,
         placement: action === "success" ? "top" : "bottom",
         duration: 3000,
-        render: ({ id: tid }) => (
-          React.createElement(Toast, { nativeID: "toast-" + tid, action, variant: "solid" },
-            React.createElement(VStack, { space: "xs" },
+        render: ({ id: tid }) =>
+          React.createElement(
+            Toast,
+            { nativeID: "toast-" + tid, action, variant: "solid" },
+            React.createElement(
+              VStack,
+              { space: "xs" },
               React.createElement(ToastTitle, null, title),
-              React.createElement(ToastDescription, null, description)
-            )
-          )
-        ),
+              React.createElement(ToastDescription, null, description),
+            ),
+          ),
       });
     },
     [toast],
@@ -182,10 +193,14 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
       return;
     }
 
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
-      Alert.alert("Permission required", "Permission to access the media library is required.");
+      Alert.alert(
+        "Permission required",
+        "Permission to access the media library is required.",
+      );
       return;
     }
 

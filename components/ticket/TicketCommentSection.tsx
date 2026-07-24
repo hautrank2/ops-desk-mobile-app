@@ -1,5 +1,10 @@
 import { ticketCommentApis } from "@/apis/ticket-comment";
-import { Button, ButtonIcon, ButtonText, ButtonSpinner } from "@/components/ui/button";
+import {
+  Button,
+  ButtonIcon,
+  ButtonSpinner,
+  ButtonText,
+} from "@/components/ui/button";
 import { Input, InputField } from "@/components/ui/input";
 import {
   Toast,
@@ -10,6 +15,7 @@ import {
 import { VStack } from "@/components/ui/vstack";
 import { LOCAL_KEYS } from "@/constants/local";
 import { TicketCommentModel } from "@/types";
+import { getFileUrl } from "@/utils/file";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
@@ -27,15 +33,14 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { getFileUrl } from "@/utils/file";
 
 // Safe Pure-JS Base64 Decoder
-const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const chars =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const base64Decode = (input: string): string => {
   const str = input.replace(/=+$/, "");
   let output = "";
@@ -85,9 +90,17 @@ const formatDate = (dateStr: string) => {
 type CommentItemProps = {
   comment: TicketCommentModel;
   currentUserId: string | null;
-  onReply: (parentId: string, content: string, images: FileAsset[]) => Promise<void>;
+  onReply: (
+    parentId: string,
+    content: string,
+    images: FileAsset[],
+  ) => Promise<void>;
   onEdit: (commentId: string, content: string) => Promise<void>;
-  onEditImages: (commentId: string, keepUrls: string[], images: FileAsset[]) => Promise<void>;
+  onEditImages: (
+    commentId: string,
+    keepUrls: string[],
+    images: FileAsset[],
+  ) => Promise<void>;
   onDelete: (commentId: string) => Promise<void>;
 };
 
@@ -109,7 +122,11 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
     getUserIdFromToken().then(setCurrentUserId);
   }, []);
 
-  const { data: comments = [], isLoading, refetch } = useQuery({
+  const {
+    data: comments = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["ticket-comments", ticketId],
     queryFn: () => ticketCommentApis.getList(ticketId),
   });
@@ -135,7 +152,11 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
   );
 
   const createMutation = useMutation({
-    mutationFn: (args: { content: string; parentId?: string; images?: FileAsset[] }) =>
+    mutationFn: (args: {
+      content: string;
+      parentId?: string;
+      images?: FileAsset[];
+    }) =>
       ticketCommentApis.create({
         ticketId,
         content: args.content,
@@ -152,16 +173,28 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ commentId, content }: { commentId: string; content: string }) =>
-      ticketCommentApis.update(commentId, { content }),
+    mutationFn: ({
+      commentId,
+      content,
+    }: {
+      commentId: string;
+      content: string;
+    }) => ticketCommentApis.update(commentId, { content }),
     onSuccess: () => {
       refetch();
     },
   });
 
   const updateImagesMutation = useMutation({
-    mutationFn: ({ commentId, keepUrls, images }: { commentId: string; keepUrls: string[]; images: FileAsset[] }) =>
-      ticketCommentApis.updateImages(commentId, { keepUrls, images }),
+    mutationFn: ({
+      commentId,
+      keepUrls,
+      images,
+    }: {
+      commentId: string;
+      keepUrls: string[];
+      images: FileAsset[];
+    }) => ticketCommentApis.updateImages(commentId, { keepUrls, images }),
     onSuccess: () => {
       refetch();
     },
@@ -211,7 +244,9 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
   };
 
   if (isLoading) {
-    return <ActivityIndicator size="small" className="py-4 text-typography-500" />;
+    return (
+      <ActivityIndicator size="small" className="py-4 text-typography-500" />
+    );
   }
 
   return (
@@ -219,7 +254,6 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
       <Text className="text-base font-bold text-typography-800">
         Comments ({comments.length})
       </Text>
-
       {/* Root form */}
       <View className="bg-background-50 p-3 rounded-lg border border-outline-200">
         <Input className="bg-background-0 min-h-[60px] p-2 border-outline-200">
@@ -236,11 +270,20 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
         {rootImages.length > 0 && (
           <View className="flex-row flex-wrap gap-2 mt-2">
             {rootImages.map((img, idx) => (
-              <View key={idx} className="relative w-12 h-12 rounded border border-outline-200 overflow-hidden bg-background-0">
-                <Image source={{ uri: img.uri }} className="w-full h-full" resizeMode="cover" />
+              <View
+                key={idx}
+                className="relative w-12 h-12 rounded border border-outline-200 overflow-hidden bg-background-0"
+              >
+                <Image
+                  source={{ uri: img.uri }}
+                  className="w-full h-full"
+                  resizeMode="cover"
+                />
                 <TouchableOpacity
                   className="absolute -top-1 -right-1 bg-background-500 rounded-full p-0.5"
-                  onPress={() => setRootImages((prev) => prev.filter((_, i) => i !== idx))}
+                  onPress={() =>
+                    setRootImages((prev) => prev.filter((_, i) => i !== idx))
+                  }
                 >
                   <X size={10} className="text-typography-0" />
                 </TouchableOpacity>
@@ -255,14 +298,17 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
             <ButtonText>Attach ({rootImages.length}/5)</ButtonText>
           </Button>
 
-          <Button size="xs" onPress={handlePostRoot} isDisabled={createMutation.isPending}>
+          <Button
+            size="xs"
+            onPress={handlePostRoot}
+            isDisabled={createMutation.isPending}
+          >
             {createMutation.isPending && <ButtonSpinner className="mr-1" />}
             <ButtonIcon as={Send} className="mr-1" />
             <ButtonText>Send</ButtonText>
           </Button>
         </View>
       </View>
-
       {/* Threaded List */}
       <View className="space-y-4">
         {comments.map((comment) => (
@@ -271,23 +317,40 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
             comment={comment}
             currentUserId={currentUserId}
             onReply={async (pid, content, imgs) => {
-              await createMutation.mutateAsync({ content, parentId: pid, images: imgs });
+              await createMutation.mutateAsync({
+                content,
+                parentId: pid,
+                images: imgs,
+              });
             }}
             onEdit={async (cid, content) => {
               await updateMutation.mutateAsync({ commentId: cid, content });
             }}
             onEditImages={async (cid, keepUrls, imgs) => {
-              await updateImagesMutation.mutateAsync({ commentId: cid, keepUrls, images: imgs });
+              await updateImagesMutation.mutateAsync({
+                commentId: cid,
+                keepUrls,
+                images: imgs,
+              });
             }}
             onDelete={async (cid) => {
-              Alert.alert("Confirm Delete", "Are you sure you want to delete this comment?", [
-                { text: "Cancel", style: "cancel" },
-                { text: "Delete", style: "destructive", onPress: () => deleteMutation.mutate(cid) },
-              ]);
+              Alert.alert(
+                "Confirm Delete",
+                "Are you sure you want to delete this comment?",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: () => deleteMutation.mutate(cid),
+                  },
+                ],
+              );
             }}
           />
         ))}
       </View>
+      s
     </VStack>
   );
 };
@@ -308,13 +371,19 @@ const CommentItemNode = ({
   const [replyImages, setReplyImages] = useState<FileAsset[]>([]);
 
   const [editContent, setEditContent] = useState(comment.content);
-  const [editKeepUrls, setEditKeepUrls] = useState<string[]>(comment.imgUrls || []);
+  const [editKeepUrls, setEditKeepUrls] = useState<string[]>(
+    comment.imgUrls || [],
+  );
   const [editImages, setEditImages] = useState<FileAsset[]>([]);
 
   const [loading, setLoading] = useState(false);
 
-  const createdByUser = typeof comment.createdBy === "object" ? comment.createdBy : null;
-  const createdById = typeof comment.createdBy === "object" ? comment.createdBy._id : comment.createdBy;
+  const createdByUser =
+    typeof comment.createdBy === "object" ? comment.createdBy : null;
+  const createdById =
+    typeof comment.createdBy === "object"
+      ? comment.createdBy._id
+      : comment.createdBy;
   const authorName = createdByUser?.name || createdByUser?.username || "User";
   const isOwner = currentUserId === createdById;
 
@@ -326,7 +395,8 @@ const CommentItemNode = ({
       setReplyContent("");
       setReplyImages([]);
       setIsReplying(false);
-    } catch {} finally {
+    } catch {
+    } finally {
       setLoading(false);
     }
   };
@@ -345,7 +415,8 @@ const CommentItemNode = ({
       }
       setEditImages([]);
       setIsEditing(false);
-    } catch {} finally {
+    } catch {
+    } finally {
       setLoading(false);
     }
   };
@@ -410,22 +481,32 @@ const CommentItemNode = ({
         <View className="bg-background-50 p-3 rounded-lg border border-outline-100">
           <View className="flex-row items-center justify-between mb-1.5">
             <View className="flex-row items-center gap-1.5">
-              <Text className="text-xs font-bold text-typography-800 font-roboto">{authorName}</Text>
+              <Text className="text-xs font-bold text-typography-800 font-roboto">
+                {authorName}
+              </Text>
               <Text className="text-[10px] text-typography-400 font-mono">
                 {formatDate(comment.createdAt)}
               </Text>
               {comment.updatedBy && (
-                <Text className="text-[10px] text-typography-400 italic font-roboto">(edited)</Text>
+                <Text className="text-[10px] text-typography-400 italic font-roboto">
+                  (edited)
+                </Text>
               )}
             </View>
 
             {isOwner && !isEditing && (
               <View className="flex-row gap-2">
                 <TouchableOpacity onPress={() => setIsEditing(true)}>
-                  <Pencil size={12} className="text-typography-500 hover:text-typography-800" />
+                  <Pencil
+                    size={12}
+                    className="text-typography-500 hover:text-typography-800"
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => onDelete(comment._id)}>
-                  <Trash2 size={12} className="text-typography-500 hover:text-error-600" />
+                  <Trash2
+                    size={12}
+                    className="text-typography-500 hover:text-error-600"
+                  />
                 </TouchableOpacity>
               </View>
             )}
@@ -446,11 +527,20 @@ const CommentItemNode = ({
               {/* Edit images */}
               <View className="flex-row flex-wrap gap-2">
                 {editKeepUrls.map((url, idx) => (
-                  <View key={idx} className="relative w-10 h-10 border border-outline-200 rounded">
-                    <Image source={getFileUrl(url)} className="w-full h-full" resizeMode="cover" />
+                  <View
+                    key={idx}
+                    className="relative w-10 h-10 border border-outline-200 rounded"
+                  >
+                    <Image
+                      source={{ uri: getFileUrl(url) }}
+                      className="w-full h-full"
+                      resizeMode="cover"
+                    />
                     <TouchableOpacity
                       className="absolute -top-1 -right-1 bg-error-600 rounded-full p-0.5"
-                      onPress={() => setEditKeepUrls((prev) => prev.filter((u) => u !== url))}
+                      onPress={() =>
+                        setEditKeepUrls((prev) => prev.filter((u) => u !== url))
+                      }
                     >
                       <X size={8} className="text-typography-0" />
                     </TouchableOpacity>
@@ -458,11 +548,22 @@ const CommentItemNode = ({
                 ))}
 
                 {editImages.map((img, idx) => (
-                  <View key={idx} className="relative w-10 h-10 border border-success-300 rounded">
-                    <Image source={{ uri: img.uri }} className="w-full h-full" resizeMode="cover" />
+                  <View
+                    key={idx}
+                    className="relative w-10 h-10 border border-success-300 rounded"
+                  >
+                    <Image
+                      source={{ uri: img.uri }}
+                      className="w-full h-full"
+                      resizeMode="cover"
+                    />
                     <TouchableOpacity
                       className="absolute -top-1 -right-1 bg-error-600 rounded-full p-0.5"
-                      onPress={() => setEditImages((prev) => prev.filter((_, i) => i !== idx))}
+                      onPress={() =>
+                        setEditImages((prev) =>
+                          prev.filter((_, i) => i !== idx),
+                        )
+                      }
                     >
                       <X size={8} className="text-typography-0" />
                     </TouchableOpacity>
@@ -471,16 +572,31 @@ const CommentItemNode = ({
               </View>
 
               <View className="flex-row justify-between items-center">
-                <Button variant="outline" size="xs" onPress={handlePickEditImages} isDisabled={editKeepUrls.length + editImages.length >= 5}>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onPress={handlePickEditImages}
+                  isDisabled={editKeepUrls.length + editImages.length >= 5}
+                >
                   <ButtonIcon as={Paperclip} className="mr-1" />
                   <ButtonText>Photo</ButtonText>
                 </Button>
 
                 <View className="flex-row gap-1.5">
-                  <Button variant="outline" size="xs" className="h-7" onPress={() => setIsEditing(false)}>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    className="h-7"
+                    onPress={() => setIsEditing(false)}
+                  >
                     <ButtonText>Cancel</ButtonText>
                   </Button>
-                  <Button size="xs" className="h-7" onPress={handleEditSubmit} isDisabled={loading}>
+                  <Button
+                    size="xs"
+                    className="h-7"
+                    onPress={handleEditSubmit}
+                    isDisabled={loading}
+                  >
                     {loading && <ButtonSpinner className="mr-1" />}
                     <ButtonText>Save</ButtonText>
                   </Button>
@@ -498,7 +614,7 @@ const CommentItemNode = ({
                   {comment.imgUrls.map((url, i) => (
                     <Image
                       key={i}
-                      source={getFileUrl(url)}
+                      source={{ uri: getFileUrl(url) }}
                       className="w-12 h-12 rounded border border-outline-100"
                       resizeMode="cover"
                     />
@@ -511,7 +627,9 @@ const CommentItemNode = ({
                 onPress={() => setIsReplying((r) => !r)}
               >
                 <MessageSquare size={12} className="text-typography-400" />
-                <Text className="text-[11px] text-typography-400 font-medium font-roboto">Reply</Text>
+                <Text className="text-[11px] text-typography-400 font-medium font-roboto">
+                  Reply
+                </Text>
               </TouchableOpacity>
             </VStack>
           )}
@@ -536,11 +654,22 @@ const CommentItemNode = ({
               {replyImages.length > 0 && (
                 <View className="flex-row flex-wrap gap-1.5 mt-1.5">
                   {replyImages.map((img, idx) => (
-                    <View key={idx} className="relative w-8 h-8 rounded border overflow-hidden bg-background-0">
-                      <Image source={{ uri: img.uri }} className="w-full h-full" resizeMode="cover" />
+                    <View
+                      key={idx}
+                      className="relative w-8 h-8 rounded border overflow-hidden bg-background-0"
+                    >
+                      <Image
+                        source={{ uri: img.uri }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                      />
                       <TouchableOpacity
                         className="absolute -top-1 -right-1 bg-background-500 rounded-full p-0.5"
-                        onPress={() => setReplyImages((prev) => prev.filter((_, i) => i !== idx))}
+                        onPress={() =>
+                          setReplyImages((prev) =>
+                            prev.filter((_, i) => i !== idx),
+                          )
+                        }
                       >
                         <X size={8} className="text-typography-0" />
                       </TouchableOpacity>
@@ -550,14 +679,19 @@ const CommentItemNode = ({
               )}
 
               <View className="flex-row justify-between items-center mt-2">
-                <Button variant="outline" size="xs" className="h-6" onPress={handlePickReplyImages}>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  className="h-6"
+                  onPress={handlePickReplyImages}
+                >
                   <ButtonIcon as={Paperclip} className="mr-1" />
                   <ButtonText>Photo</ButtonText>
                 </Button>
 
                 <View className="flex-row gap-1">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="xs"
                     className="h-6"
                     onPress={() => {
@@ -568,7 +702,12 @@ const CommentItemNode = ({
                   >
                     <ButtonText>Cancel</ButtonText>
                   </Button>
-                  <Button size="xs" className="h-6" onPress={handleReply} isDisabled={loading}>
+                  <Button
+                    size="xs"
+                    className="h-6"
+                    onPress={handleReply}
+                    isDisabled={loading}
+                  >
                     {loading && <ButtonSpinner className="mr-1" />}
                     <ButtonText>Send</ButtonText>
                   </Button>

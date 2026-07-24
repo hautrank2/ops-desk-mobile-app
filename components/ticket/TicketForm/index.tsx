@@ -1,14 +1,4 @@
-import React, { useState } from "react";
-import { Alert, ScrollView, View, Text, TouchableOpacity, Platform, Modal } from "react-native";
-import { Controller } from "react-hook-form";
-import { ChevronDownIcon, Square, CheckSquare, Trash2, X } from "lucide-react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import {
-  Button,
-  ButtonIcon,
-  ButtonSpinner,
-  ButtonText,
-} from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
   FormControl,
   FormControlError,
@@ -16,6 +6,7 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from "@/components/ui/form-control";
+import { Image } from "@/components/ui/image";
 import { Input, InputField } from "@/components/ui/input";
 import {
   Select,
@@ -30,11 +21,33 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { VStack } from "@/components/ui/vstack";
-import { Image } from "@/components/ui/image";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
+import {
+  CheckSquare,
+  ChevronDownIcon,
+  Square,
+  Trash2,
+  X,
+} from "lucide-react-native";
+import React, { useState } from "react";
+import { Controller } from "react-hook-form";
+import {
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { useTicketForm } from "./hook";
-import { TicketFormProps, ticketTypes, ticketPriorities, ticketStatuses } from "./type";
+import {
+  TicketFormProps,
+  ticketPriorities,
+  ticketStatuses,
+  ticketTypes,
+} from "./type";
 
 export const TicketForm = (props: TicketFormProps) => {
   const {
@@ -64,172 +77,267 @@ export const TicketForm = (props: TicketFormProps) => {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background-0" contentContainerStyle={{ padding: 16 }}>
+    <ScrollView
+      className="flex-1 bg-background-0"
+      contentContainerStyle={{ padding: 16 }}
+    >
       <VStack space="md">
         {/* Ticket Code */}
         <FormControl isRequired isInvalid={!!errors.code}>
-          <FormControlLabel><FormControlLabelText>Ticket Code</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Ticket Code</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="code"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input isDisabled={isEdit}>
-                <InputField placeholder="e.g. TKT-001" onBlur={onBlur} onChangeText={onChange} value={value} />
+                <InputField
+                  placeholder="e.g. TKT-001"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
               </Input>
             )}
           />
-          <FormControlError><FormControlErrorText>{errors.code?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>{errors.code?.message}</FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Title */}
         <FormControl isRequired isInvalid={!!errors.title}>
-          <FormControlLabel><FormControlLabelText>Title</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Title</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="title"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
-                <InputField placeholder="e.g. AC leaking in room 102" onBlur={onBlur} onChangeText={onChange} value={value} />
+                <InputField
+                  placeholder="e.g. AC leaking in room 102"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
               </Input>
             )}
           />
-          <FormControlError><FormControlErrorText>{errors.title?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>{errors.title?.message}</FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Type */}
         <FormControl isRequired isInvalid={!!errors.type}>
-          <FormControlLabel><FormControlLabelText>Type</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Type</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="type"
             render={({ field: { onChange, onBlur, value } }) => (
               <Select selectedValue={value} onValueChange={(v) => onChange(v)}>
-                <SelectTrigger variant="outline" size="md" className="justify-between">
+                <SelectTrigger
+                  variant="outline"
+                  size="md"
+                  className="justify-between"
+                >
                   <SelectInput placeholder="Select type" onBlur={onBlur} />
                   <SelectIcon className="mr-3" as={ChevronDownIcon} />
                 </SelectTrigger>
                 <SelectPortal>
                   <SelectBackdrop />
                   <SelectContent>
-                    <SelectDragIndicatorWrapper><SelectDragIndicator /></SelectDragIndicatorWrapper>
-                    {ticketTypes.map((v) => <SelectItem key={v} label={v} value={v} />)}
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
+                    {ticketTypes.map((v) => (
+                      <SelectItem key={v} label={v} value={v} />
+                    ))}
                   </SelectContent>
                 </SelectPortal>
               </Select>
             )}
           />
-          <FormControlError><FormControlErrorText>{errors.type?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>{errors.type?.message}</FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Priority */}
         <FormControl isRequired isInvalid={!!errors.priority}>
-          <FormControlLabel><FormControlLabelText>Priority</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Priority</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="priority"
             render={({ field: { onChange, onBlur, value } }) => (
               <Select selectedValue={value} onValueChange={(v) => onChange(v)}>
-                <SelectTrigger variant="outline" size="md" className="justify-between">
+                <SelectTrigger
+                  variant="outline"
+                  size="md"
+                  className="justify-between"
+                >
                   <SelectInput placeholder="Select priority" onBlur={onBlur} />
                   <SelectIcon className="mr-3" as={ChevronDownIcon} />
                 </SelectTrigger>
                 <SelectPortal>
                   <SelectBackdrop />
                   <SelectContent>
-                    <SelectDragIndicatorWrapper><SelectDragIndicator /></SelectDragIndicatorWrapper>
-                    {ticketPriorities.map((v) => <SelectItem key={v} label={v} value={v} />)}
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
+                    {ticketPriorities.map((v) => (
+                      <SelectItem key={v} label={v} value={v} />
+                    ))}
                   </SelectContent>
                 </SelectPortal>
               </Select>
             )}
           />
-          <FormControlError><FormControlErrorText>{errors.priority?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>
+              {errors.priority?.message}
+            </FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Status */}
         <FormControl isRequired isInvalid={!!errors.status}>
-          <FormControlLabel><FormControlLabelText>Status</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Status</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="status"
             render={({ field: { onChange, onBlur, value } }) => (
               <Select selectedValue={value} onValueChange={(v) => onChange(v)}>
-                <SelectTrigger variant="outline" size="md" className="justify-between">
+                <SelectTrigger
+                  variant="outline"
+                  size="md"
+                  className="justify-between"
+                >
                   <SelectInput placeholder="Select status" onBlur={onBlur} />
                   <SelectIcon className="mr-3" as={ChevronDownIcon} />
                 </SelectTrigger>
                 <SelectPortal>
                   <SelectBackdrop />
                   <SelectContent>
-                    <SelectDragIndicatorWrapper><SelectDragIndicator /></SelectDragIndicatorWrapper>
-                    {ticketStatuses.map((v) => <SelectItem key={v} label={v} value={v} />)}
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
+                    {ticketStatuses.map((v) => (
+                      <SelectItem key={v} label={v} value={v} />
+                    ))}
                   </SelectContent>
                 </SelectPortal>
               </Select>
             )}
           />
-          <FormControlError><FormControlErrorText>{errors.status?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>
+              {errors.status?.message}
+            </FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Location */}
         <FormControl isInvalid={!!errors.locationId}>
-          <FormControlLabel><FormControlLabelText>Location</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Location</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="locationId"
             render={({ field: { onChange, onBlur, value } }) => (
               <Select selectedValue={value} onValueChange={(v) => onChange(v)}>
-                <SelectTrigger variant="outline" size="md" className="justify-between">
+                <SelectTrigger
+                  variant="outline"
+                  size="md"
+                  className="justify-between"
+                >
                   <SelectInput placeholder="Select Location" onBlur={onBlur} />
                   <SelectIcon className="mr-3" as={ChevronDownIcon} />
                 </SelectTrigger>
                 <SelectPortal>
                   <SelectBackdrop />
                   <SelectContent>
-                    <SelectDragIndicatorWrapper><SelectDragIndicator /></SelectDragIndicatorWrapper>
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
                     <SelectItem label="None" value="" />
                     {locations.map((loc) => (
-                      <SelectItem key={loc._id} label={`${loc.name} ${loc.floor ? `(Floor ${loc.floor})` : ""}`} value={loc._id} />
+                      <SelectItem
+                        key={loc._id}
+                        label={`${loc.name} ${loc.floor ? `(Floor ${loc.floor})` : ""}`}
+                        value={loc._id}
+                      />
                     ))}
                   </SelectContent>
                 </SelectPortal>
               </Select>
             )}
           />
-          <FormControlError><FormControlErrorText>{errors.locationId?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>
+              {errors.locationId?.message}
+            </FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Assignee */}
         <FormControl isInvalid={!!errors.assigneeId}>
-          <FormControlLabel><FormControlLabelText>Assignee</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Assignee</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="assigneeId"
             render={({ field: { onChange, onBlur, value } }) => (
               <Select selectedValue={value} onValueChange={(v) => onChange(v)}>
-                <SelectTrigger variant="outline" size="md" className="justify-between">
+                <SelectTrigger
+                  variant="outline"
+                  size="md"
+                  className="justify-between"
+                >
                   <SelectInput placeholder="Select Assignee" onBlur={onBlur} />
                   <SelectIcon className="mr-3" as={ChevronDownIcon} />
                 </SelectTrigger>
                 <SelectPortal>
                   <SelectBackdrop />
                   <SelectContent>
-                    <SelectDragIndicatorWrapper><SelectDragIndicator /></SelectDragIndicatorWrapper>
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
                     <SelectItem label="Unassigned" value="" />
                     {users.map((u) => (
-                      <SelectItem key={u._id} label={u.name || u.username} value={u._id} />
+                      <SelectItem
+                        key={u._id}
+                        label={u.name || u.username}
+                        value={u._id}
+                      />
                     ))}
                   </SelectContent>
                 </SelectPortal>
               </Select>
             )}
           />
-          <FormControlError><FormControlErrorText>{errors.assigneeId?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>
+              {errors.assigneeId?.message}
+            </FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Due Date */}
         <FormControl isInvalid={!!errors.dueAt}>
-          <FormControlLabel><FormControlLabelText>Due Date</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Due Date</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="dueAt"
@@ -239,8 +347,8 @@ export const TicketForm = (props: TicketFormProps) => {
 
               const handleConfirm = (date: Date) => {
                 const yyyy = date.getFullYear();
-                const mm = String(date.getMonth() + 1).padStart(2, '0');
-                const dd = String(date.getDate()).padStart(2, '0');
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
                 onChange(`${yyyy}-${mm}-${dd}`);
               };
 
@@ -256,7 +364,7 @@ export const TicketForm = (props: TicketFormProps) => {
                     </Input>
                   </TouchableOpacity>
 
-                  {Platform.OS === 'ios' ? (
+                  {Platform.OS === "ios" ? (
                     <Modal
                       visible={showPicker}
                       transparent={true}
@@ -265,9 +373,15 @@ export const TicketForm = (props: TicketFormProps) => {
                       <View className="flex-1 justify-end bg-black/40">
                         <View className="bg-background-0 p-4 rounded-t-2xl pb-8">
                           <View className="flex-row justify-between items-center mb-4">
-                            <Text className="text-typography-800 font-bold">Select Date</Text>
-                            <TouchableOpacity onPress={() => setShowPicker(false)}>
-                              <Text className="text-primary-600 font-bold">Done</Text>
+                            <Text className="text-typography-800 font-bold">
+                              Select Date
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() => setShowPicker(false)}
+                            >
+                              <Text className="text-primary-600 font-bold">
+                                Done
+                              </Text>
                             </TouchableOpacity>
                           </View>
                           <DateTimePicker
@@ -302,13 +416,17 @@ export const TicketForm = (props: TicketFormProps) => {
               );
             }}
           />
-          <FormControlError><FormControlErrorText>{errors.dueAt?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>{errors.dueAt?.message}</FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Asset Items Upgraded Selection */}
         <FormControl isRequired isInvalid={!!errors.assetItemIds}>
-          <FormControlLabel><FormControlLabelText>Select Asset Items</FormControlLabelText></FormControlLabel>
-          
+          <FormControlLabel>
+            <FormControlLabelText>Select Asset Items</FormControlLabelText>
+          </FormControlLabel>
+
           {/* Search bar inside selection container */}
           <View className="mb-2">
             <Input size="sm">
@@ -348,7 +466,7 @@ export const TicketForm = (props: TicketFormProps) => {
                 <ScrollView nestedScrollEnabled className="space-y-3">
                   {filtered.map((item) => {
                     const assetName =
-                      typeof item.asset === "object"
+                      typeof item.assetId === "object"
                         ? item.asset.name
                         : "Asset";
                     const codeLabel = item._id.slice(-6).toUpperCase();
@@ -361,14 +479,21 @@ export const TicketForm = (props: TicketFormProps) => {
                         className="flex-row items-center py-1.5"
                         onPress={() => {
                           const next = isChecked
-                            ? selectedAssetItemIds.filter((id) => id !== item._id)
+                            ? selectedAssetItemIds.filter(
+                                (id) => id !== item._id,
+                              )
                             : [...selectedAssetItemIds, item._id];
-                          setValue("assetItemIds", next, { shouldValidate: true });
+                          setValue("assetItemIds", next, {
+                            shouldValidate: true,
+                          });
                         }}
                       >
                         <View className="mr-2.5">
                           {isChecked ? (
-                            <CheckSquare size={18} className="text-primary-600" />
+                            <CheckSquare
+                              size={18}
+                              className="text-primary-600"
+                            />
                           ) : (
                             <Square size={18} className="text-typography-400" />
                           )}
@@ -404,8 +529,12 @@ export const TicketForm = (props: TicketFormProps) => {
                     </Text>
                     <TouchableOpacity
                       onPress={() => {
-                        const next = selectedAssetItemIds.filter((x) => x !== id);
-                        setValue("assetItemIds", next, { shouldValidate: true });
+                        const next = selectedAssetItemIds.filter(
+                          (x) => x !== id,
+                        );
+                        setValue("assetItemIds", next, {
+                          shouldValidate: true,
+                        });
                       }}
                       className="p-0.5 rounded-full"
                     >
@@ -417,18 +546,29 @@ export const TicketForm = (props: TicketFormProps) => {
             </View>
           )}
 
-          <FormControlError><FormControlErrorText>{errors.assetItemIds?.message}</FormControlErrorText></FormControlError>
+          <FormControlError>
+            <FormControlErrorText>
+              {errors.assetItemIds?.message}
+            </FormControlErrorText>
+          </FormControlError>
         </FormControl>
 
         {/* Cause */}
         <FormControl>
-          <FormControlLabel><FormControlLabelText>Root Cause</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Root Cause</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="cause"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
-                <InputField placeholder="e.g. Blown fuse" onBlur={onBlur} onChangeText={onChange} value={value} />
+                <InputField
+                  placeholder="e.g. Blown fuse"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
               </Input>
             )}
           />
@@ -436,13 +576,20 @@ export const TicketForm = (props: TicketFormProps) => {
 
         {/* Note */}
         <FormControl>
-          <FormControlLabel><FormControlLabelText>Internal Note</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Internal Note</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="note"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
-                <InputField placeholder="Internal comments..." onBlur={onBlur} onChangeText={onChange} value={value} />
+                <InputField
+                  placeholder="Internal comments..."
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
               </Input>
             )}
           />
@@ -450,7 +597,9 @@ export const TicketForm = (props: TicketFormProps) => {
 
         {/* Description */}
         <FormControl>
-          <FormControlLabel><FormControlLabelText>Description</FormControlLabelText></FormControlLabel>
+          <FormControlLabel>
+            <FormControlLabelText>Description</FormControlLabelText>
+          </FormControlLabel>
           <Controller
             control={control}
             name="description"
@@ -472,11 +621,21 @@ export const TicketForm = (props: TicketFormProps) => {
         {/* Images Selection - Create Mode Only */}
         {!isEdit && (
           <FormControl>
-            <FormControlLabel><FormControlLabelText>Images (Max 2)</FormControlLabelText></FormControlLabel>
+            <FormControlLabel>
+              <FormControlLabelText>Images (Max 2)</FormControlLabelText>
+            </FormControlLabel>
             <View className="flex-row items-center gap-3 mt-1 flex-wrap">
               {imageField.fields.map((field, idx) => (
-                <View key={field.id} className="relative w-20 h-20 border border-outline-200 rounded-lg overflow-hidden bg-background-50">
-                  <Image source={{ uri: field.uri }} alt="Preview" className="w-full h-full" resizeMode="cover" />
+                <View
+                  key={field.id}
+                  className="relative w-20 h-20 border border-outline-200 rounded-lg overflow-hidden bg-background-50"
+                >
+                  <Image
+                    source={{ uri: field.uri }}
+                    alt="Preview"
+                    className="w-full h-full"
+                    resizeMode="cover"
+                  />
                   <TouchableOpacity
                     className="absolute top-1 right-1 bg-error-600 rounded-full p-1 w-6 h-6 items-center justify-center"
                     onPress={() => imageField.remove(idx)}
@@ -491,7 +650,9 @@ export const TicketForm = (props: TicketFormProps) => {
                   className="w-20 h-20 border border-dashed border-outline-300 rounded-lg items-center justify-center bg-background-50"
                   onPress={onPickImage}
                 >
-                  <Text className="text-typography-400 text-xs font-bold">+ Photo</Text>
+                  <Text className="text-typography-400 text-xs font-bold">
+                    + Photo
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -500,10 +661,19 @@ export const TicketForm = (props: TicketFormProps) => {
 
         {/* Action Buttons */}
         <View className="flex-row gap-3 mt-4">
-          <Button variant="outline" className="flex-1" onPress={() => router.back()} isDisabled={loading}>
+          <Button
+            variant="outline"
+            className="flex-1"
+            onPress={() => router.back()}
+            isDisabled={loading}
+          >
             <ButtonText>Cancel</ButtonText>
           </Button>
-          <Button className="flex-1" onPress={handleSubmit} isDisabled={loading}>
+          <Button
+            className="flex-1"
+            onPress={handleSubmit}
+            isDisabled={loading}
+          >
             {loading && <ButtonSpinner className="mr-2" />}
             <ButtonText>{isEdit ? "Update Ticket" : "Save Ticket"}</ButtonText>
           </Button>
@@ -512,4 +682,3 @@ export const TicketForm = (props: TicketFormProps) => {
     </ScrollView>
   );
 };
-export default TicketForm;
