@@ -35,6 +35,7 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [assetSearchQuery, setAssetSearchQuery] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
 
   // Queries
   const { data: ticketData, isLoading: isLoadingTicket } = useQuery({
@@ -247,5 +248,7 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
     imageField,
     onPickImage,
     handleSubmit: () => handleSubmit(onSubmit)(),
+    showPicker,
+    setShowPicker,
   };
 };
