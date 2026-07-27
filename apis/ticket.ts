@@ -1,6 +1,8 @@
 import { LOCAL_KEYS } from "@/constants/local";
+import { httpClient } from "@/lib/httpClient";
 import {
   AddTicketImageModel,
+  AssetItemModel,
   CreateTicketModel,
   TableResponse,
   TicketModel,
@@ -8,7 +10,6 @@ import {
   UpdateTicketModel,
 } from "@/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { httpClient } from "@/lib/httpClient";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -115,7 +116,10 @@ export const ticketApis = {
   /**
    * POST /ticket/:id/images  — multipart/form-data, field "images", max 2
    */
-  addImages: async ({ id, images }: AddTicketImageModel): Promise<TicketModel> => {
+  addImages: async ({
+    id,
+    images,
+  }: AddTicketImageModel): Promise<TicketModel> => {
     const fd = new FormData();
     images.slice(0, 2).forEach((img, i) => {
       fd.append("images", {
@@ -135,6 +139,32 @@ export const ticketApis = {
     const res = await httpClient.delete<TicketModel>(
       `/ticket/${id}/images/${imgIndex}`,
     );
+    return res.data;
+  },
+
+  /**
+   * GET /ticket/:id/items
+   */
+  getItems: async (id: string): Promise<AssetItemModel[]> => {
+    const res = await httpClient.get<AssetItemModel[]>(`/ticket/${id}/items`);
+    return res.data;
+  },
+
+  /**
+   * POST /ticket/:id/items
+   */
+  addItems: async (id: string, itemIds: string[]): Promise<any> => {
+    const res = await httpClient.post<any>(`/ticket/${id}/items`, { itemIds });
+    return res.data;
+  },
+
+  /**
+   * POST /ticket/:id/remove-items
+   */
+  removeItems: async (id: string, itemIds: string[]): Promise<any> => {
+    const res = await httpClient.post<any>(`/ticket/${id}/remove-items`, {
+      itemIds,
+    });
     return res.data;
   },
 };

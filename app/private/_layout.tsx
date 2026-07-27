@@ -5,6 +5,7 @@ import {
   LayoutDashboardIcon,
   PackageIcon,
   TicketIcon,
+  User,
 } from "lucide-react-native";
 
 export default function RootLayout() {
@@ -40,6 +41,13 @@ export default function RootLayout() {
           title: "Ticket",
           headerShown: false,
           tabBarIcon: ({ color }) => <Icon as={TicketIcon} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) => <Icon as={User} color={color} />,
         }}
       />
     </Tabs>
