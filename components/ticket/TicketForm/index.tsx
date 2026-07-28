@@ -30,7 +30,7 @@ import {
   Trash2,
   X,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React from "react";
 import { Controller } from "react-hook-form";
 import {
   Modal,
@@ -66,6 +66,8 @@ export const TicketForm = (props: TicketFormProps) => {
     imageField,
     onPickImage,
     handleSubmit,
+    showPicker,
+    setShowPicker,
   } = useTicketForm(props);
 
   if (isEdit && isLoadingTicket) {
@@ -342,7 +344,6 @@ export const TicketForm = (props: TicketFormProps) => {
             control={control}
             name="dueAt"
             render={({ field: { onChange, value } }) => {
-              const [showPicker, setShowPicker] = useState(false);
               const currentDate = value ? new Date(value) : new Date();
 
               const handleConfirm = (date: Date) => {
