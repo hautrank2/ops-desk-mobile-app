@@ -1,4 +1,4 @@
-import { assetApi } from "@/api/asset";
+import { assetApis } from "@/apis/asset";
 import { AssetForm } from "@/components/asset/AssetForm";
 import { Text } from "@/components/ui/text";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ const EditAssetScreen = () => {
 
   const { isLoading } = useQuery({
     queryKey: ["asset", id],
-    queryFn: () => assetApi.getById(id!),
+    queryFn: () => assetApis.getById(id!),
     enabled: !!id,
   });
 

@@ -1,3 +1,4 @@
+import { AssetModel } from './asset';
 import { UserModel } from './user';
 
 export enum AssetItemStatus {
@@ -7,9 +8,16 @@ export enum AssetItemStatus {
   Retired = "Retired",
 }
 
+/**
+ * Các field có thể populate khi query asset-item.
+ * Khớp với AssetItemPopulationEnum bên server.
+ */
+export type AssetItemPopulation = "assetId" | "createdBy" | "updatedBy";
+
 export type AssetItemModel = {
   _id: string;
-  assetId: string;
+  /** string khi chưa populate; AssetModel khi populate "assetId" */
+  assetId: string | AssetModel;
   code: string;
   status: AssetItemStatus;
   locationId?: string;
@@ -34,8 +42,8 @@ export type AssetItemQueryModel = {
   assetId?: string;
   /** Filter by status */
   status?: AssetItemStatus;
-  /** Populate related fields */
-  include?: ("createdBy" | "updatedBy")[];
+  /** Populate related fields (assetId, createdBy, updatedBy) */
+  populations?: AssetItemPopulation[];
 };
 
 export type CreateAssetItemModel = {

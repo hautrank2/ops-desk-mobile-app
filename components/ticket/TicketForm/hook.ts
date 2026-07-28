@@ -1,3 +1,4 @@
+import { assetItemApis } from "@/apis/asset-item";
 import { ticketApis } from "@/apis/ticket";
 import {
   Toast,
@@ -62,12 +63,10 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
   });
 
   const { data: assetItems = [] } = useQuery<AssetItemModel[]>({
-    queryKey: ["get", "asset-items-all"],
+    queryKey: ["get", "asset-items-all", "populate-asset"],
     queryFn: async () => {
-      const { data } = await httpClient.get<
-        TableResponse<AssetItemModel> | AssetItemModel[]
-      >("/asset-item");
-      return Array.isArray(data) ? data : data.items || [];
+      const res = await assetItemApis.getList({ populations: ["assetId"] });
+      return res.items || [];
     },
   });
 

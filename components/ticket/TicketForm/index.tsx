@@ -444,7 +444,9 @@ export const TicketForm = (props: TicketFormProps) => {
                 if (!assetSearchQuery) return true;
                 const query = assetSearchQuery.toLowerCase();
                 const assetName =
-                  typeof item.asset === "object" ? item.asset.name : "Asset";
+                  typeof item.assetId === "object"
+                    ? item.assetId.name
+                    : "Asset";
                 const code = item._id.slice(-6).toUpperCase();
                 const sn = item.serialNumber || "";
                 return (
@@ -467,7 +469,7 @@ export const TicketForm = (props: TicketFormProps) => {
                   {filtered.map((item) => {
                     const assetName =
                       typeof item.assetId === "object"
-                        ? item.asset.name
+                        ? item.assetId.name
                         : "Asset";
                     const codeLabel = item._id.slice(-6).toUpperCase();
                     const labelText = `${assetName} (${codeLabel}) ${item.serialNumber ? `· SN: ${item.serialNumber}` : ""}`;
@@ -516,7 +518,9 @@ export const TicketForm = (props: TicketFormProps) => {
                 const item = assetItems.find((a) => a._id === id);
                 if (!item) return null;
                 const assetName =
-                  typeof item.asset === "object" ? item.asset.name : "Asset";
+                  typeof item.assetId === "object"
+                    ? item.assetId.name
+                    : "Asset";
                 const codeLabel = item._id.slice(-6).toUpperCase();
 
                 return (

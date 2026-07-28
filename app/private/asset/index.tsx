@@ -1,4 +1,4 @@
-import { assetApi } from "@/api/asset";
+import { assetApis } from "@/apis/asset";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import {
   Table,
@@ -31,11 +31,11 @@ const AssetScreen = () => {
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["get", "asset", page, pageSize],
-    queryFn: () => assetApi.getList({ page, pageSize }),
+    queryFn: () => assetApis.getList({ page, pageSize }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => assetApi.remove(id),
+    mutationFn: (id: string) => assetApis.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["get", "asset"] });
     },

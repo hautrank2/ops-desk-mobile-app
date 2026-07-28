@@ -1,3 +1,4 @@
+import { assetItemApis } from "@/apis/asset-item";
 import { ticketApis } from "@/apis/ticket";
 import { TicketCommentSection } from "@/components/ticket/TicketCommentSection";
 import { TicketForm } from "@/components/ticket/TicketForm";
@@ -9,8 +10,7 @@ import {
 } from "@/components/ui/button";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import { httpClient } from "@/lib/httpClient";
-import { AssetItemModel, TableResponse } from "@/types";
+import { AssetItemModel } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -63,12 +63,10 @@ const DetailTicketScreen = () => {
 
   // System-wide available asset items for selection query
   const { data: allAssetItems = [] } = useQuery<AssetItemModel[]>({
-    queryKey: ["get", "asset-items-all"],
+    queryKey: ["get", "asset-items-all", "populate-asset"],
     queryFn: async () => {
-      const { data } = await httpClient.get<
-        TableResponse<AssetItemModel> | AssetItemModel[]
-      >("/asset-item");
-      return Array.isArray(data) ? data : data.items || [];
+      const res = await assetItemApis.getList({ populations: ["assetId"] });
+      return res.items || [];
     },
     enabled: isAddModalOpen,
   });
@@ -85,7 +83,7 @@ const DetailTicketScreen = () => {
     const query = searchQuery.toLowerCase();
     return availableAssetItems.filter((item) => {
       const assetName =
-        typeof item.asset === "object" ? item.asset.name : "Asset";
+        typeof item.assetId === "object" ? item.assetId.name : "Asset";
       const codeLabel = item._id.slice(-6).toUpperCase();
       const sn = item.serialNumber || "";
       return (
@@ -285,8 +283,8 @@ const DetailTicketScreen = () => {
                 <ScrollView className="flex-1">
                   {ticketItems.map((item) => {
                     const assetName =
-                      typeof item.asset === "object"
-                        ? item.asset.name
+                      typeof item.assetId === "object"
+                        ? item.assetId.name
                         : "Asset";
                     const codeLabel = item._id.slice(-6).toUpperCase();
 
@@ -381,8 +379,8 @@ const DetailTicketScreen = () => {
                 <ScrollView className="flex-1">
                   {filteredAvailableItems.map((item) => {
                     const assetName =
-                      typeof item.asset === "object"
-                        ? item.asset.name
+                      typeof item.assetId === "object"
+                        ? item.assetId.name
                         : "Asset";
                     const codeLabel = item._id.slice(-6).toUpperCase();
                     const isSelected = selectedItemIdsToAdd.includes(item._id);

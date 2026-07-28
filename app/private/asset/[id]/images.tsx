@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import { assetApi } from "@/api/asset";
+import { assetApis } from "@/apis/asset";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
@@ -37,7 +37,7 @@ const AssetImagesScreen = () => {
 
   const { data: asset, isLoading } = useQuery({
     queryKey: ["asset", id],
-    queryFn: () => assetApi.getById(id!),
+    queryFn: () => assetApis.getById(id!),
     enabled: !!id,
   });
 
@@ -74,7 +74,7 @@ const AssetImagesScreen = () => {
         fileName?: string | null;
         mimeType?: string | null;
       }[],
-    ) => assetApi.addImages(id!, images),
+    ) => assetApis.addImages({ id: id!, images }),
     onSuccess: (updated) => {
       queryClient.setQueryData(["asset", id], updated);
       queryClient.invalidateQueries({ queryKey: ["get", "asset"] });
@@ -90,7 +90,7 @@ const AssetImagesScreen = () => {
   // ─── Remove image mutation ───────────────────────────────────────────────────
 
   const removeMutation = useMutation({
-    mutationFn: (imgIndex: number) => assetApi.removeImage(id!, imgIndex),
+    mutationFn: (imgIndex: number) => assetApis.removeImage(id!, imgIndex),
     onSuccess: (updated) => {
       queryClient.setQueryData(["asset", id], updated);
       queryClient.invalidateQueries({ queryKey: ["get", "asset"] });

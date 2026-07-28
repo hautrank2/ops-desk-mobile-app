@@ -1,4 +1,4 @@
-import { assetApi } from "@/api/asset";
+import { assetApis } from "@/apis/asset";
 import {
   Button,
   ButtonIcon,
@@ -88,7 +88,7 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
 
   const { data: assetData, isLoading: isLoadingData } = useQuery({
     queryKey: ["asset", assetId],
-    queryFn: () => assetApi.getById(assetId!),
+    queryFn: () => assetApis.getById(assetId!),
     enabled: isEdit,
   });
 
@@ -131,7 +131,7 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
 
   const createMutation = useMutation({
     mutationFn: (payload: AssetFormValues) =>
-      assetApi.create({
+      assetApis.create({
         code: payload.code,
         name: payload.name,
         type: payload.type as AssetType,
@@ -158,7 +158,7 @@ export const AssetForm = ({ assetId }: AssetFormProps) => {
 
   const updateMutation = useMutation({
     mutationFn: (payload: AssetFormValues) =>
-      assetApi.update(assetId!, {
+      assetApis.update(assetId!, {
         name: payload.name,
         type: payload.type as AssetType,
         vendor: payload.vendor || undefined,

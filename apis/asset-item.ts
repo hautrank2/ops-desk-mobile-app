@@ -1,6 +1,7 @@
 import { httpClient } from "@/lib/httpClient";
 import {
   AssetItemModel,
+  AssetItemPopulation,
   AssetItemQueryModel,
   TableResponse,
   UpdateAssetItemModel,
@@ -25,14 +26,14 @@ export const assetItemApis = {
 
   /**
    * GET /asset-item/:id
-   * Query: include[] — populate createdBy, updatedBy
+   * Query: populations[] — populate assetId, createdBy, updatedBy
    */
   getById: async (
     id: string,
-    include?: ("createdBy" | "updatedBy")[],
+    populations?: AssetItemPopulation[],
   ): Promise<AssetItemModel> => {
     const res = await httpClient.get<AssetItemModel>(`/asset-item/${id}`, {
-      params: include?.length ? { include } : undefined,
+      params: populations?.length ? { populations } : undefined,
     });
     return res.data;
   },
