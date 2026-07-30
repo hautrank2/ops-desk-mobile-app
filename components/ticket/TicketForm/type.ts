@@ -11,7 +11,6 @@ export const ticketPriorities = Object.values(TicketPriority);
 export const ticketStatuses = Object.values(TicketStatus);
 
 export const ticketSchema = z.object({
-  code: z.string().min(3, "Code must be at least 3 characters"),
   title: z.string().min(5, "Title must be at least 5 characters"),
   type: z.enum(Object.values(TicketType) as [string, ...string[]]),
   priority: z.enum(Object.values(TicketPriority) as [string, ...string[]]),
@@ -36,7 +35,6 @@ export type TicketFormProps = {
 };
 
 export const getDefaultValues = (ticketData?: any): TicketFormValues => ({
-  code: ticketData?.code ?? "",
   title: ticketData?.title ?? "",
   type: ticketData?.type ?? TicketType.Repair,
   priority: ticketData?.priority ?? TicketPriority.Medium,

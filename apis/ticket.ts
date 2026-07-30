@@ -79,10 +79,10 @@ export const ticketApis = {
    */
   create: async (args: CreateTicketModel): Promise<TicketModel> => {
     const fd = new FormData();
-    fd.append("code", args.code);
     fd.append("title", args.title);
     fd.append("type", args.type);
-    args.assetItemIds.forEach((id) => fd.append("assetItemIds", id));
+    // Server CreateTicketDto expects the field name "assetItems".
+    args.assetItemIds.forEach((id) => fd.append("assetItems", id));
     if (args.description) fd.append("description", args.description);
     if (args.priority) fd.append("priority", args.priority);
     if (args.status) fd.append("status", args.status);

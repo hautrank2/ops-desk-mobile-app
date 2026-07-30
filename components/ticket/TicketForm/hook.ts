@@ -21,7 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Alert } from "react-native";
 import {
@@ -35,9 +35,6 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
   const isEdit = !!ticketId;
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [assetSearchQuery, setAssetSearchQuery] = useState("");
-  const [showPicker, setShowPicker] = useState(false);
-
   // Queries
   const { data: ticketData, isLoading: isLoadingTicket } = useQuery({
     queryKey: ["ticket", ticketId],
@@ -63,6 +60,8 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
     },
   });
 
+  // Dùng để hiển thị tên trong danh sách đã chọn. Chung queryKey với dialog
+  // nên react-query chia sẻ cache, không fetch lại.
   const { data: assetItems = [] } = useQuery<AssetItemModel[]>({
     queryKey: ["get", "asset-items-all", "populate-asset"],
     queryFn: async () => {
@@ -76,8 +75,6 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
-    watch,
   } = useForm<TicketFormValues>({
     resolver: zodResolver(ticketSchema),
     defaultValues: getDefaultValues(),
@@ -94,8 +91,6 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
     control,
     name: "images",
   });
-
-  const selectedAssetItemIds = watch("assetItemIds") || [];
 
   const showToast = useCallback(
     (action: "success" | "error", title: string, description: string) => {
@@ -123,7 +118,6 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
   const createMutation = useMutation({
     mutationFn: (payload: TicketFormValues) =>
       ticketApis.create({
-        code: payload.code,
         title: payload.title,
         type: payload.type as TicketType,
         priority: payload.priority as TicketPriority,
@@ -240,14 +234,8 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
     locations,
     users,
     assetItems,
-    assetSearchQuery,
-    setAssetSearchQuery,
-    selectedAssetItemIds,
-    setValue,
     imageField,
     onPickImage,
     handleSubmit: () => handleSubmit(onSubmit)(),
-    showPicker,
-    setShowPicker,
   };
 };

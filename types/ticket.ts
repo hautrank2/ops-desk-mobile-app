@@ -70,7 +70,6 @@ export type TicketQueryModel = {
 };
 
 export type CreateTicketModel = {
-  code: string;
   title: string;
   description?: string;
   type: TicketType;
