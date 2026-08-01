@@ -35,6 +35,7 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { TicketAddAssetItemDialog } from "@/components/ticket/TicketAddAssetItem";
 import { TicketAssetItemTable } from "@/components/ticket/TicketAssetItemTable";
+import { LocationSelectField } from "@/components/selects";
 import { useTicketForm } from "./hook";
 import {
   TicketFormProps,
@@ -50,7 +51,6 @@ export const TicketForm = (props: TicketFormProps) => {
     loading,
     control,
     errors,
-    locations,
     users,
     assetItems,
     imageField,
@@ -214,48 +214,20 @@ export const TicketForm = (props: TicketFormProps) => {
         </FormControl>
 
         {/* Location */}
-        <FormControl isInvalid={!!errors.locationId}>
-          <FormControlLabel>
-            <FormControlLabelText>Location</FormControlLabelText>
-          </FormControlLabel>
-          <Controller
-            control={control}
-            name="locationId"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Select selectedValue={value} onValueChange={(v) => onChange(v)}>
-                <SelectTrigger
-                  variant="outline"
-                  size="md"
-                  className="justify-between"
-                >
-                  <SelectInput placeholder="Select Location" onBlur={onBlur} />
-                  <SelectIcon className="mr-3" as={ChevronDownIcon} />
-                </SelectTrigger>
-                <SelectPortal>
-                  <SelectBackdrop />
-                  <SelectContent>
-                    <SelectDragIndicatorWrapper>
-                      <SelectDragIndicator />
-                    </SelectDragIndicatorWrapper>
-                    <SelectItem label="None" value="" />
-                    {locations.map((loc) => (
-                      <SelectItem
-                        key={loc._id}
-                        label={`${loc.name} ${loc.floor ? `(Floor ${loc.floor})` : ""}`}
-                        value={loc._id}
-                      />
-                    ))}
-                  </SelectContent>
-                </SelectPortal>
-              </Select>
-            )}
-          />
-          <FormControlError>
-            <FormControlErrorText>
-              {errors.locationId?.message}
-            </FormControlErrorText>
-          </FormControlError>
-        </FormControl>
+        <Controller
+          control={control}
+          name="locationId"
+          render={({ field: { onChange, value } }) => (
+            <LocationSelectField
+              label="Location"
+              isClearable
+              placeholder="Select location..."
+              value={value}
+              onChange={onChange}
+              errorMessage={errors.locationId?.message}
+            />
+          )}
+        />
 
         {/* Assignee */}
         <FormControl isInvalid={!!errors.assigneeId}>
@@ -338,65 +310,67 @@ export const TicketForm = (props: TicketFormProps) => {
           </FormControlError>
         </FormControl>
 
-        {/* Asset Items — trigger + danh sách đã chọn; chọn qua Dialog */}
-        <Controller
-          control={control}
-          name="assetItemIds"
-          render={({ field: { onChange, value } }) => {
-            const selectedIds = value || [];
-            const selectedItems = selectedIds
-              .map((id) => assetItems.find((a) => a._id === id))
-              .filter((v): v is (typeof assetItems)[number] => Boolean(v));
-            return (
-              <FormControl isRequired isInvalid={!!errors.assetItemIds}>
-                <FormControlLabel>
-                  <FormControlLabelText>
-                    Select Asset Items ({selectedItems.length})
-                  </FormControlLabelText>
-                </FormControlLabel>
+        {/* Asset Items — chỉ chọn khi tạo mới; không cho sửa khi edit ticket */}
+        {!isEdit && (
+          <Controller
+            control={control}
+            name="assetItemIds"
+            render={({ field: { onChange, value } }) => {
+              const selectedIds = value || [];
+              const selectedItems = selectedIds
+                .map((id) => assetItems.find((a) => a._id === id))
+                .filter((v): v is (typeof assetItems)[number] => Boolean(v));
+              return (
+                <FormControl isRequired isInvalid={!!errors.assetItemIds}>
+                  <FormControlLabel>
+                    <FormControlLabelText>
+                      Select Asset Items ({selectedItems.length})
+                    </FormControlLabelText>
+                  </FormControlLabel>
 
-                {/* Trigger mở Dialog */}
-                <Button
-                  variant="outline"
-                  size="md"
-                  onPress={() => {
-                    setIsAssetDialogOpen(true);
-                  }}
-                >
-                  <ButtonText>Add Asset Items</ButtonText>
-                </Button>
+                  {/* Trigger mở Dialog */}
+                  <Button
+                    variant="outline"
+                    size="md"
+                    onPress={() => {
+                      setIsAssetDialogOpen(true);
+                    }}
+                  >
+                    <ButtonText>Add Asset Items</ButtonText>
+                  </Button>
 
-                {/* Danh sách đã chọn */}
-                <TicketAssetItemTable
-                  data={selectedItems}
-                  onClickDelete={(item) =>
-                    onChange(selectedIds.filter((x) => x !== item._id))
-                  }
-                  maxHeight={640}
-                />
+                  {/* Danh sách đã chọn */}
+                  <TicketAssetItemTable
+                    data={selectedItems}
+                    onClickDelete={(item) =>
+                      onChange(selectedIds.filter((x) => x !== item._id))
+                    }
+                    maxHeight={640}
+                  />
 
-                <FormControlError>
-                  <FormControlErrorText>
-                    {errors.assetItemIds?.message}
-                  </FormControlErrorText>
-                </FormControlError>
+                  <FormControlError>
+                    <FormControlErrorText>
+                      {errors.assetItemIds?.message}
+                    </FormControlErrorText>
+                  </FormControlError>
 
-                {/* Dialog chọn thêm asset item (ẩn item đã chọn) */}
-                <TicketAddAssetItemDialog
-                  isOpen={isAssetDialogOpen}
-                  isEdit={isEdit}
-                  defaultValues={{ assetItemIds: [] }}
-                  excludedAssetItemId={selectedIds}
-                  onCancel={() => setIsAssetDialogOpen(false)}
-                  onSubmit={(ids) => {
-                    onChange(Array.from(new Set([...selectedIds, ...ids])));
-                    setIsAssetDialogOpen(false);
-                  }}
-                />
-              </FormControl>
-            );
-          }}
-        />
+                  {/* Dialog chọn thêm asset item (ẩn item đã chọn) */}
+                  <TicketAddAssetItemDialog
+                    isOpen={isAssetDialogOpen}
+                    isEdit={isEdit}
+                    defaultValues={{ assetItemIds: [] }}
+                    excludedAssetItemId={selectedIds}
+                    onCancel={() => setIsAssetDialogOpen(false)}
+                    onSubmit={(ids) => {
+                      onChange(Array.from(new Set([...selectedIds, ...ids])));
+                      setIsAssetDialogOpen(false);
+                    }}
+                  />
+                </FormControl>
+              );
+            }}
+          />
+        )}
 
         {/* Cause */}
         <FormControl>

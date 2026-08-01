@@ -1,7 +1,3 @@
-import { assetApis } from "@/apis/asset";
-import { httpClient } from "@/lib/httpClient";
-import { AssetModel, LocationModel, TableResponse } from "@/types";
-import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import {
   AssetItemFilterProps,
@@ -17,25 +13,6 @@ export const useAssetItemFilter = ({
 }: AssetItemFilterProps) => {
   const { control, handleSubmit, reset } = useForm<AssetItemFilterValues>({
     defaultValues: { ...defaultAssetItemFilter, ...defaultValues },
-  });
-
-  // Dữ liệu cho dropdown
-  const { data: locations = [] } = useQuery<LocationModel[]>({
-    queryKey: ["get", "locations-all"],
-    queryFn: async () => {
-      const { data } = await httpClient.get<
-        LocationModel[] | TableResponse<LocationModel>
-      >("/location");
-      return Array.isArray(data) ? data : data.items || [];
-    },
-  });
-
-  const { data: assets = [] } = useQuery<AssetModel[]>({
-    queryKey: ["get", "assets-all"],
-    queryFn: async () => {
-      const res = await assetApis.getList();
-      return res.items || [];
-    },
   });
 
   const normalize = (values: AssetItemFilterValues): AssetItemFilterResult => ({
@@ -54,5 +31,5 @@ export const useAssetItemFilter = ({
     onApply({});
   };
 
-  return { control, locations, assets, applyFilter, resetFilter };
+  return { control, applyFilter, resetFilter };
 };

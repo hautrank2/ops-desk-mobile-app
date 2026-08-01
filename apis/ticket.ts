@@ -3,6 +3,7 @@ import { httpClient } from "@/lib/httpClient";
 import {
   AddTicketImageModel,
   AssetItemModel,
+  AssetItemPopulation,
   CreateTicketModel,
   TableResponse,
   TicketModel,
@@ -144,9 +145,15 @@ export const ticketApis = {
 
   /**
    * GET /ticket/:id/items
+   * Query: populations[] — populate assetId, createdBy, updatedBy
    */
-  getItems: async (id: string): Promise<AssetItemModel[]> => {
-    const res = await httpClient.get<AssetItemModel[]>(`/ticket/${id}/items`);
+  getItems: async (
+    id: string,
+    populations?: AssetItemPopulation[],
+  ): Promise<AssetItemModel[]> => {
+    const res = await httpClient.get<AssetItemModel[]>(`/ticket/${id}/items`, {
+      params: populations?.length ? { populations } : undefined,
+    });
     return res.data;
   },
 

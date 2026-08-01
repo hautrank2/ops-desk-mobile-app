@@ -256,14 +256,14 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
       </Text>
       {/* Root form */}
       <View className="bg-background-50 p-3 rounded-lg border border-outline-200">
-        <Input className="bg-background-0 min-h-[60px] p-2 border-outline-200">
+        <Input className="bg-background-0 min-h-[60px] h-auto items-start p-2 border-outline-200">
           <InputField
             multiline
             placeholder="Write a comment..."
             value={rootContent}
             onChangeText={setRootContent}
             textAlignVertical="top"
-            className="text-sm text-typography-800"
+            className="text-sm text-typography-800 h-auto"
           />
         </Input>
 
@@ -350,7 +350,6 @@ export const TicketCommentSection = ({ ticketId }: { ticketId: string }) => {
           />
         ))}
       </View>
-      s
     </VStack>
   );
 };
@@ -478,7 +477,7 @@ const CommentItemNode = ({
 
       {/* Right side: Body */}
       <View className="flex-1 space-y-1.5">
-        <View className="bg-background-50 p-3 rounded-lg border border-outline-100">
+        <View className="bg-background-50 p-3 rounded-lg border border-outline-100 h-auto">
           <View className="flex-row items-center justify-between mb-1.5">
             <View className="flex-row items-center gap-1.5">
               <Text className="text-xs font-bold text-typography-800 font-roboto">
@@ -514,13 +513,13 @@ const CommentItemNode = ({
 
           {isEditing ? (
             <VStack space="sm">
-              <Input className="bg-background-0 min-h-[50px] p-1.5 border-outline-200">
+              <Input className="bg-background-0 min-h-[50px] h-auto items-start p-1.5 border-outline-200">
                 <InputField
                   multiline
                   value={editContent}
                   onChangeText={setEditContent}
                   textAlignVertical="top"
-                  className="text-xs text-typography-800"
+                  className="text-xs text-typography-800 h-auto"
                 />
               </Input>
 
@@ -640,14 +639,14 @@ const CommentItemNode = ({
           <View className="flex-row items-start gap-1.5 pl-2 pt-1">
             <CornerDownRight size={12} className="text-typography-400 mt-2" />
             <View className="flex-1 bg-background-50 p-2.5 rounded-lg border border-outline-200">
-              <Input className="bg-background-0 min-h-[40px] p-1.5 border-outline-200">
+              <Input className="bg-background-0 min-h-[40px] h-auto items-start p-1.5 border-outline-200">
                 <InputField
                   multiline
                   placeholder={`Reply to ${authorName}...`}
                   value={replyContent}
                   onChangeText={setReplyContent}
                   textAlignVertical="top"
-                  className="text-xs text-typography-800"
+                  className="text-xs text-typography-800 h-auto"
                 />
               </Input>
 

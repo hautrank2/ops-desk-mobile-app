@@ -39,7 +39,8 @@ export type TicketModel = {
   teamId?: string;
   dueAt?: string;
   closedAt?: string;
-  images: string[];
+  /** Uploaded ticket image URLs (server field: imageUrls) */
+  imageUrls: string[];
   createdAt: string;
   updatedAt: string;
   createdBy?: UserModel;

@@ -51,7 +51,7 @@ export type AssetQueryModel = {
   createdBy?: string;
   sortBy?: "createdAt" | "updatedAt" | "code" | "name" | "type" | "active";
   order?: "asc" | "desc";
-  include?: ("createdBy" | "updatedBy")[];
+  populations?: ("createdBy" | "updatedBy")[];
   itemCount?: boolean;
 };
 

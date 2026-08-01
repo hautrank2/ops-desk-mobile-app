@@ -10,8 +10,6 @@ import { VStack } from "@/components/ui/vstack";
 import { httpClient } from "@/lib/httpClient";
 import {
   AssetItemModel,
-  LocationModel,
-  TableResponse,
   TicketPriority,
   TicketStatus,
   TicketType,
@@ -40,16 +38,6 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
     queryKey: ["ticket", ticketId],
     queryFn: () => ticketApis.getById(ticketId!),
     enabled: isEdit,
-  });
-
-  const { data: locations = [] } = useQuery<LocationModel[]>({
-    queryKey: ["get", "locations-all"],
-    queryFn: async () => {
-      const { data } = await httpClient.get<
-        LocationModel[] | TableResponse<LocationModel>
-      >("/location");
-      return Array.isArray(data) ? data : data.items || [];
-    },
   });
 
   const { data: users = [] } = useQuery<UserModel[]>({
@@ -150,7 +138,6 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
         type: payload.type as TicketType,
         priority: payload.priority as TicketPriority,
         status: payload.status as TicketStatus,
-        assetItemIds: payload.assetItemIds,
         locationId: payload.locationId || undefined,
         assigneeId: payload.assigneeId || undefined,
         dueAt: payload.dueAt || undefined,
@@ -231,7 +218,6 @@ export const useTicketForm = ({ ticketId }: TicketFormProps) => {
     loading,
     control,
     errors,
-    locations,
     users,
     assetItems,
     imageField,

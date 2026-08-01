@@ -1,3 +1,4 @@
+import { AssetSelectField, LocationSelectField } from "@/components/selects";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
   FormControl,
@@ -29,8 +30,7 @@ import { AssetItemFilterProps } from "./type";
 const statusOptions = Object.values(AssetItemStatus);
 
 export const AssetItemFilter = (props: AssetItemFilterProps) => {
-  const { control, locations, assets, applyFilter, resetFilter } =
-    useAssetItemFilter(props);
+  const { control, applyFilter, resetFilter } = useAssetItemFilter(props);
 
   return (
     <VStack space="md" className="p-4 bg-background-0">
@@ -108,74 +108,34 @@ export const AssetItemFilter = (props: AssetItemFilterProps) => {
       </FormControl>
 
       {/* Asset */}
-      <FormControl>
-        <FormControlLabel>
-          <FormControlLabelText>Asset</FormControlLabelText>
-        </FormControlLabel>
-        <Controller
-          control={control}
-          name="assetId"
-          render={({ field: { onChange, value } }) => (
-            <Select selectedValue={value} onValueChange={onChange}>
-              <SelectTrigger variant="outline" size="md" className="justify-between">
-                <SelectInput placeholder="All assets" />
-                <SelectIcon className="mr-3" as={ChevronDownIcon} />
-              </SelectTrigger>
-              <SelectPortal>
-                <SelectBackdrop />
-                <SelectContent>
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
-                  <SelectItem label="All assets" value="" />
-                  {assets.map((a) => (
-                    <SelectItem
-                      key={a._id}
-                      label={`${a.code} - ${a.name}`}
-                      value={a._id}
-                    />
-                  ))}
-                </SelectContent>
-              </SelectPortal>
-            </Select>
-          )}
-        />
-      </FormControl>
+      <Controller
+        control={control}
+        name="assetId"
+        render={({ field: { onChange, value } }) => (
+          <AssetSelectField
+            label="Asset"
+            isClearable
+            placeholder="All assets"
+            value={value}
+            onChange={onChange}
+          />
+        )}
+      />
 
       {/* Location */}
-      <FormControl>
-        <FormControlLabel>
-          <FormControlLabelText>Location</FormControlLabelText>
-        </FormControlLabel>
-        <Controller
-          control={control}
-          name="locationId"
-          render={({ field: { onChange, value } }) => (
-            <Select selectedValue={value} onValueChange={onChange}>
-              <SelectTrigger variant="outline" size="md" className="justify-between">
-                <SelectInput placeholder="All locations" />
-                <SelectIcon className="mr-3" as={ChevronDownIcon} />
-              </SelectTrigger>
-              <SelectPortal>
-                <SelectBackdrop />
-                <SelectContent>
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
-                  <SelectItem label="All locations" value="" />
-                  {locations.map((l) => (
-                    <SelectItem
-                      key={l._id}
-                      label={`${l.code} - ${l.name}`}
-                      value={l._id}
-                    />
-                  ))}
-                </SelectContent>
-              </SelectPortal>
-            </Select>
-          )}
-        />
-      </FormControl>
+      <Controller
+        control={control}
+        name="locationId"
+        render={({ field: { onChange, value } }) => (
+          <LocationSelectField
+            label="Location"
+            isClearable
+            placeholder="All locations"
+            value={value}
+            onChange={onChange}
+          />
+        )}
+      />
 
       {/* Actions */}
       <View className="flex-row gap-3 mt-1">
