@@ -111,31 +111,34 @@ export const DateTimePicker = ({
     <DateTimePickerContext.Provider value={ctx}>
       {children}
 
-      {isOpen &&
-        (Platform.OS === "ios" ? (
-          <IOSPicker
-            value={value}
-            mode={mode}
-            minimumDate={minimumDate}
-            maximumDate={maximumDate}
-            is24Hour={is24Hour}
-            onChange={onChange}
-            onClose={close}
-          />
-        ) : (
-          <DateTimePickerNative
-            value={value ?? new Date()}
-            mode={nativeMode}
-            display="default"
-            minimumDate={minimumDate}
-            maximumDate={maximumDate}
-            is24Hour={is24Hour}
-            onChange={(event, selected) => {
-              close();
-              if (event.type === "set" && selected) onChange?.(selected);
-            }}
-          />
-        ))}
+      {isOpen && Platform.OS === "ios" && (
+        <IOSPicker
+          value={value}
+          mode={mode}
+          minimumDate={minimumDate}
+          maximumDate={maximumDate}
+          is24Hour={is24Hour}
+          onChange={onChange}
+          onClose={close}
+        />
+      )}
+
+      {/* Android renders the native dialog directly. Web has no native picker,
+          so it is intentionally skipped to avoid an undefined-component crash. */}
+      {isOpen && Platform.OS === "android" && (
+        <DateTimePickerNative
+          value={value ?? new Date()}
+          mode={nativeMode}
+          display="default"
+          minimumDate={minimumDate}
+          maximumDate={maximumDate}
+          is24Hour={is24Hour}
+          onChange={(event, selected) => {
+            close();
+            if (event.type === "set" && selected) onChange?.(selected);
+          }}
+        />
+      )}
     </DateTimePickerContext.Provider>
   );
 };
