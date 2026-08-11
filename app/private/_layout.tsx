@@ -1,14 +1,19 @@
 import { Icon } from "@/components/ui/icon";
+import { useAuthCtx } from "@/store/auth";
 import { Tabs } from "expo-router";
 import {
   BoxIcon,
   LayoutDashboardIcon,
   PackageIcon,
+  SlidersHorizontalIcon,
   TicketIcon,
   User,
 } from "lucide-react-native";
 
 export default function RootLayout() {
+  const { payload } = useAuthCtx();
+  const isAdmin = payload?.role === "admin";
+
   return (
     <Tabs>
       <Tabs.Screen
@@ -41,6 +46,18 @@ export default function RootLayout() {
           title: "Ticket",
           headerShown: false,
           tabBarIcon: ({ color }) => <Icon as={TicketIcon} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="manage"
+        options={{
+          title: "Manage",
+          headerShown: false,
+          // Admin-only: hide from the tab bar and block navigation for others
+          href: isAdmin ? undefined : null,
+          tabBarIcon: ({ color }) => (
+            <Icon as={SlidersHorizontalIcon} color={color} />
+          ),
         }}
       />
       <Tabs.Screen

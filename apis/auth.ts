@@ -1,5 +1,5 @@
 import { httpClient } from "@/lib/httpClient";
-import { SigninModel, SigninResponseModel } from "@/types";
+import { SigninModel, SigninResponseModel, UserModel } from "@/types";
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 
@@ -21,6 +21,16 @@ export const authApi = {
    */
   checkToken: async (): Promise<{ valid: boolean }> => {
     const res = await httpClient.get<{ valid: boolean }>("/auth/valid-token");
+    return res.data;
+  },
+
+  /**
+   * GET /auth/me
+   * Header: Authorization: Bearer <token>
+   * Response: full profile of the current user
+   */
+  me: async (): Promise<UserModel> => {
+    const res = await httpClient.get<UserModel>("/auth/me");
     return res.data;
   },
 };

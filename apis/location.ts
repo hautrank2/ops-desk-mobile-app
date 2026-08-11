@@ -53,4 +53,12 @@ export const locationApis = {
     );
     return res.data;
   },
+
+  /**
+   * DELETE /location/:id
+   */
+  remove: async (id: string): Promise<LocationModel> => {
+    const res = await httpClient.delete<LocationModel>(`/location/${id}`);
+    return res.data;
+  },
 };

@@ -12,7 +12,8 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from "../ui/form-control";
-import { Input, InputField } from "../ui/input";
+import { Input, InputField, InputIcon, InputSlot } from "../ui/input";
+import { EyeIcon, EyeOffIcon } from "lucide-react-native";
 import { Toast, ToastTitle, useToast } from "../ui/toast";
 
 export type LoginFormProps = {
@@ -66,6 +67,7 @@ export const LoginForm = ({
     },
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const mutation = useMutation({
     mutationKey: ["login"],
@@ -198,7 +200,15 @@ export const LoginForm = ({
                     value={value}
                     onChangeText={onChange}
                     placeholder="Enter password here..."
+                    type={showPassword ? "text" : "password"}
+                    secureTextEntry={!showPassword}
                   />
+                  <InputSlot
+                    className="pr-3"
+                    onPress={() => setShowPassword((prev) => !prev)}
+                  >
+                    <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
+                  </InputSlot>
                 </Input>
                 <FormControlError>
                   <FormControlErrorIcon />

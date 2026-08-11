@@ -2,6 +2,7 @@ export * from "./api";
 export * from "./asset";
 export * from "./asset-item";
 export * from "./auth";
+export * from "./dashboard";
 export * from "./department";
 export * from "./image";
 export * from "./location";
