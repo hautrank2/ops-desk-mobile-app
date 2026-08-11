@@ -16,7 +16,7 @@ import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useEffect } from "react";
 
 export const unstable_settings = {
-  anchor: "(tabs)",
+  anchor: "private",
 };
 
 export default function RootLayout() {
