@@ -3,7 +3,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
@@ -13,7 +13,6 @@ import { useAuthCtx } from "@/store/auth";
 import "../global.css";
 
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { useEffect } from "react";
 
 export const unstable_settings = {
   anchor: "private",
@@ -35,23 +34,17 @@ export default function RootLayout() {
 }
 
 const RootStack = () => {
-  const authCtx = useAuthCtx();
-  const { isAuthenticated } = authCtx;
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.navigate("/private/asset");
-    }
-  }, [isAuthenticated, router]);
+  const { isAuthenticated } = useAuthCtx();
 
   return (
     <Stack>
-      <Stack.Screen
-        name="index"
-        options={{ headerShown: false, title: "Expense app" }}
-      />
-      <Stack.Screen name="login" options={{ title: "Login" }} />
+      <Stack.Protected guard={!isAuthenticated}>
+        <Stack.Screen
+          name="index"
+          options={{ headerShown: false, title: "Expense app" }}
+        />
+        <Stack.Screen name="login" options={{ title: "Login" }} />
+      </Stack.Protected>
       <Stack.Protected guard={isAuthenticated}>
         <Stack.Screen name="private" options={{ headerShown: false }} />
       </Stack.Protected>

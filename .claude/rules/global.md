@@ -1,9 +1,3 @@
----
-trigger: always_on
-glob:
-description: Global coding conventions for the OpsDesk mobile app (TypeScript + React Native + Expo Router + Gluestack UI + NativeWind). Applies to all source under app/ or components/.
----
-
 # Global code rules
 
 These rules are mandatory for every new or edited file under `app/`, `components/`, `types/`, or `apis/`. Match the surrounding code when a local convention is stricter.

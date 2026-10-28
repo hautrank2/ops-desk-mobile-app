@@ -1,3 +1,8 @@
+---
+name: dialog-form
+description: Quy ước tạo form nằm trong Dialog (FormDialog + Form trong index.tsx, props và zod schema trong type.ts). Dùng khi tạo hoặc sửa một form trong dialog.
+---
+
 - Quy định về tạo Form trong Dialog cho tính năng A
 - Phải có ít nhất 2 component đặt vào file index.tsx
 

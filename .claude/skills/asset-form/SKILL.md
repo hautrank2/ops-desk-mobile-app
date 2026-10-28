@@ -1,3 +1,8 @@
+---
+name: asset-form
+description: Workflow tạo hoặc cập nhật form Upsert Asset (UI Gluestack, react-hook-form + zod, API, toast). Dùng khi được gọi /asset-form hoặc khi làm form tạo/sửa asset.
+---
+
 # Workflow: Upsert Asset Form
 
 ## Trigger

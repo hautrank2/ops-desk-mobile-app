@@ -1,13 +1,11 @@
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Heading } from "@/components/ui/heading";
 import { useAuthCtx } from "@/store/auth";
-import { useRouter } from "expo-router";
 import React from "react";
 import { View } from "react-native";
 
 const LoginPage = () => {
   const { onAuthticate } = useAuthCtx();
-  const router = useRouter();
 
   return (
     <View className="flex-1 p-4">
@@ -17,8 +15,10 @@ const LoginPage = () => {
         <LoginForm
           afterSuccess={async (result) => {
             if (result._id) {
+              // Chỉ cần cập nhật trạng thái auth.
+              // <Stack.Protected> trong app/_layout.tsx sẽ tự chuyển
+              // khỏi màn login sang nhóm "private" khi guard bật lên.
               await onAuthticate(result);
-              router.navigate("/private/asset");
             }
           }}
         />

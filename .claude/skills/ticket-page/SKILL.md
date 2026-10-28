@@ -1,3 +1,8 @@
+---
+name: ticket-page
+description: Kiến trúc và cách triển khai tính năng Ticket trên mobile (types, APIs, pages, components). Dùng khi thêm hoặc sửa màn hình ticket.
+---
+
 # Mobile Ticket Feature Workflow & Implementation Guide
 
 This workflow document outlines how the **Ticket** feature is designed, structured, and implemented in the `ops-desk-mobile-app` React Native Expo application, serving as a reference for future development.
